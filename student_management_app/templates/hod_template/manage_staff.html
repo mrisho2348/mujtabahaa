@@ -1,0 +1,78 @@
+ 
+{% extends 'hod_template/base_template.html' %}
+{% block page_title %}
+        Manage Staff    
+{% endblock page_title %}
+{% block main_content %}
+{% load static %}
+<section class="content">
+    <div class="container-fluid">
+        <div class="content-wrappe">
+            <!-- Content Header (Page header) -->    
+        
+            <!-- Main content -->
+            <section class="content">
+              <div class="container-fluid">
+                <div class="row">
+                  <!-- left column -->
+                  <div class="col-md-12">
+                    <!-- general form elements -->
+                    <div class="card card-primary">
+                      <div class="card-header">
+                        <h3 class="card-title">Manage Staff</h3>
+                      </div>
+                      <div class="card-body table-responsive p-0">
+                        <table class="table table-hover text-nowrap">
+                          <thead>
+                            <tr>
+                              <th>ID</th>
+                              <th>First Name</th>
+                              <th>Last Name</th>
+                              <th>User Name</th>
+                              <th>Email</th>
+                              <th>address</th>
+                              <th>last loged in</th>
+                              <th>Date joined</th>
+                              <th>Action</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            {% for staff in staffs %}
+                            <tr>
+                                <td>{{staff.admin.id}}</td>
+                                <td>{{staff.admin.first_name}}</td>
+                                <td>{{staff.admin.last_name}}</td>
+                                <td>{{staff.admin.username}}</td>
+                                <td>{{staff.admin.email}}</td>
+                                <td>{{staff.address}}</td>
+                                <td>{{staff.admin.last_login}}</td>
+                                <td>{{staff.admin.date_joined}}</td>
+                                <td><a href="/edit_staff/{{staff.admin.id}}" class="btn btn-success">Edit</a>
+                          </td>
+                         
+                       
+                            {% endfor %}                        
+                  
+                          </tbody>
+                        </table>
+                      </div>
+                      
+                    </div>
+                      </form>
+                    </div>
+
+        
+                  </div>
+
+                  </div>
+                  <!--/.col (right) -->
+                </div>
+             
+              
+            </section>
+            <!-- /.content -->
+          </div>
+    </div><!-- /.container-fluid -->
+  </section>
+
+  {% endblock main_content %}

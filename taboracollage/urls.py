@@ -1,0 +1,53 @@
+"""
+URL configuration for taboracollage project.
+
+The `urlpatterns` list routes URLs to views. For more information please see:
+    https://docs.djangoproject.com/en/4.2/topics/http/urls/
+Examples:
+Function views
+    1. Add an import:  from my_app import views
+    2. Add a URL to urlpatterns:  path('', views.home, name='home')
+Class-based views
+    1. Add an import:  from other_app.views import Home
+    2. Add a URL to urlpatterns:  path('', Home.as_view(), name='home')
+Including another URLconf
+    1. Import the include() function: from django.urls import include, path
+    2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
+"""
+from django.contrib import admin
+from django.conf.urls.static import static
+from django.urls import include, path
+from taboracollage import settings
+from student_management_app import views,HodView
+
+urlpatterns = [
+    path('', include('student_management_app.urls')),
+    path('admin/', admin.site.urls),
+    path('', views.ShowLogin, name='login'),
+    path('GetUserDetails', views.GetUserDetails, name='GetUserDetails'),
+    path('logout_user', views.logout_user, name='logout_user'),
+    path('dologin', views.DoLogin, name='DoLogin'),
+    path('admin_home', HodView.HodViews, name='HodView'),   
+    path('add_staff', HodView.add_staf, name='addstaff'),
+    path('add_staff_save', HodView.add_staff_save, name='addstaffsave'),   
+    path('add_course', HodView.add_course, name='addcourse'),   
+    path('add_course_save', HodView.add_course_save, name='addcoursesave'),    
+    path('add_student', HodView.add_student, name='add_student'),   
+    path('add_student_save', HodView.add_student_save, name='addstudentsave'),    
+    path('add_subject', HodView.add_subject, name='addsubject'),   
+    path('add_subject_save', HodView.add_subject_save, name='addsubjectsave'),    
+    path('manage_staff', HodView.manage_staff, name='manage_staff'),   
+    path('manage_student', HodView.manage_student, name='manage_student'),   
+    path('manage_course', HodView.manage_course, name='manage_course'),   
+    path('manage_subject', HodView.manage_subject, name='manage_subject'),   
+    path('edit_staff/<str:staff_id>', HodView.edit_staff, name='edit_staff'),   
+    path('edit_staff_save', HodView.edit_staff_save, name='edit_staff_save'),      
+    path('edit_student/<str:student_id>', HodView.edit_student, name='edit_student'),   
+    path('edit_student_save', HodView.edit_student_save, name='edit_student_save'),   
+    path('edit_course/<str:course_id>', HodView.edit_course, name='edit_course'),   
+    path('edit_course_save', HodView.edit_course_save, name='edit_subject_save'),   
+    path('edit_subject/<str:subject_id>', HodView.edit_subject, name='edit_course'),   
+    path('edit_subject_save', HodView.edit_subject_save, name='edit_subject'),   
+    # path('add_subject_save', HodView.add_subject_save, name='addsubjectsave'),    
+    
+]+static(settings.MEDIA_URL,document_root = settings.MEDIA_ROOT)+static(settings.STATIC_URL,document_root = settings.STATIC_ROOT)
