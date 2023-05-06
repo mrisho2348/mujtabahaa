@@ -37,7 +37,8 @@
           </li>
           <li class="nav-item">
             {% url 'manage_staff' as manage_staff %}
-            <a href="{% url 'manage_staff' %}" class="nav-link {% if request.path == manage_staff %} active{% endif %}">
+            {% url 'edit_staff' staff_id=id as edit_staff %}
+            <a href="{% url 'manage_staff' %}" class="nav-link {% if request.path == manage_staff %} active{% endif %} {% if request.path == edit_staff %}active{% endif %} ">
               <i class="nav-icon fas fa-th"></i>
               <p>
                 Manage Staff
@@ -57,7 +58,8 @@
           </li>
           <li class="nav-item">
             {% url 'manage_student' as manage_student %}
-            <a href="{% url 'manage_student' %}" class="nav-link {% if request.path == manage_student %}active{% endif %}">
+            {% url 'edit_student' student_id=id as edit_student %}
+            <a href="{% url 'manage_student' %}" class="nav-link {% if request.path == manage_student %}active{% endif %}{% if request.path == edit_student %}active{% endif %} ">
               <i class="nav-icon fas fa-th"></i>
               <p>
                 Manage Students
@@ -68,6 +70,7 @@
 
           <li class="nav-item">
             {% url 'addcourse' as addcourse %}
+                
             <a href="{% url 'addcourse' %}" class="nav-link {% if request.path == addcourse %} active{% endif %}">
               <i class="nav-icon fas fa-th"></i>
               <p>
@@ -78,7 +81,8 @@
           </li>
           <li class="nav-item">
             {% url 'manage_course' as manage_course %}
-            <a href="{% url 'manage_course' %}" class="nav-link {% if request.path == manage_course %}active{% endif %}">
+            {% url 'edit_course' course_id=id as edit_course %}
+            <a href="{% url 'manage_course' %}" class="nav-link {% if request.path == manage_course %}active{% endif %}{% if request.path == edit_course %}active{% endif %} ">
               <i class="nav-icon fas fa-th"></i>
               <p>
                 Manage Course
@@ -99,7 +103,8 @@
           </li>
           <li class="nav-item">
             {% url 'manage_subject' as manage_subject %}
-            <a href="{% url 'manage_subject' %}" class="nav-link {% if request.path == manage_subject %}active{% endif %}">
+            {% url 'edit_subject' subject_id=id as edit_subject %}
+            <a href="{% url 'manage_subject' %}" class="nav-link {% if request.path == manage_subject %}active{% endif %}{% if request.path == edit_subject %} active {% endif %} ">
               <i class="nav-icon fas fa-th"></i>
               <p>
                 Manage Subject
