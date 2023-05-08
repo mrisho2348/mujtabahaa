@@ -21,33 +21,9 @@
                       <div class="card-header">
                         <h3 class="card-title">Add Students</h3>
                       </div>
-                      <!-- /.card-header -->
-                      <!-- form start -->
-                      <form role="form" action="/add_student_save" method="POST" enctype="multipart/form-data">
-                        {% csrf_token %}
-                        <div class="card-body">
-                          
-                          {{forms}} 
+                      {% url 'add_student_save' as action_path %}
+                      {% include 'hod_template/form_template.html' with messages=messages forms=forms action_path=action_path button_text="Add Student" %}
 
-                        </div>              
-                        <!-- /.card-body -->        
-                        <div class="card-footer">
-                          <button type="submit" class="btn btn-primary btn-block">Save Student</button>
-                        </div>
-                        {% if messages %}
-                        <div class="col-12">
-                          {% for message in messages %}
-                            {% if message.tags == 'error' %}
-                              <div class="alert alert-danger">{{ message }}</div>
-                            {% elif message.tags == 'success' %}
-                              <div class="alert alert-primary">{{ message }}</div>
-                            {% endif %}
-                          {% endfor %}
-                        </div>
-                      {% endif %}
-                    </div>
-                      </form>      
-                     
                   </div>
                   <!--/.col (right) -->
                 </div>
