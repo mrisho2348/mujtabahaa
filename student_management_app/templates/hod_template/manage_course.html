@@ -33,7 +33,7 @@
                             {% for course in courses %}
                             <tr>
                                  <td>{{course.Course_name}}</td>                    
-                                <td><a href="/edit_course/{{course.id}}" class="btn btn-success">Edit</a>
+                                <td><a href=" {% url 'edit_course' course_id=course.id %}" class="btn btn-success">Edit</a>
                              </td>
                          
                        

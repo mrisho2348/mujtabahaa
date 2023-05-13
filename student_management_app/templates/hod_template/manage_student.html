@@ -33,8 +33,7 @@
                               <th>address</th>
                               <th>Gender</th>
                               <th>Profile Pic</th>
-                              <th>Start Year</th>
-                              <th>End Year</th>
+                              <th>Session Year</th>                              
                               <th>Course name</th>
                               <th>Last loged </th>
                               <th>Date joined</th>
@@ -52,12 +51,11 @@
                                 <td>{{student.address}}</td>
                                 <td>{{student.gender}}</td>
                                 <td><img src="{{student.profile_pic}}" style="width:100px" /></td>
-                                <td>{{student.session_start_year}}</td>
-                                <td>{{student.session_end_year}}</td>
+                                <td>{{student.session_id.session_start_year}} <span style="color:red">TO</span> {{student.session_id.session_end_year}}</td>                               
                                 <td>{{student.course_id.Course_name}}</td>
-                                <td>{{student..last_login}}</td>
+                                <td>{{student.admin.last_login}}</td>
                                 <td>{{student.admin.date_joined}}</td>
-                                <td><a href="/edit_student/{{student.admin.id}}" class="btn btn-success">Edit</a>
+                                <td><a href=" {% url 'edit_student' student_id=student.admin.id  %}" class="btn btn-success">Edit</a>
                       </td>
                          
                        

@@ -18,16 +18,15 @@ from django.contrib import admin
 from django.conf.urls.static import static
 from django.urls import include, path
 from taboracollage import settings
-from student_management_app import views,HodView
+from student_management_app import StudentView, views,HodView,StaffView
 
 urlpatterns = [
     path('', include('student_management_app.urls')),
     path('admin/', admin.site.urls),
     path('', views.ShowLogin, name='login'),
     path('GetUserDetails', views.GetUserDetails, name='GetUserDetails'),
-    path('logout_user', views.logout_user, name='logout_user'),
     path('dologin', views.DoLogin, name='DoLogin'),
-    path('admin_home', HodView.HodViews, name='HodView'),   
+    path('admin_home', HodView.admin_home, name='admin_home'),   
     path('add_staff', HodView.add_staff, name='addstaff'),
     path('add_staff_save', HodView.add_staff_save, name='add_staff_save'),   
     path('add_course', HodView.add_course, name='addcourse'),   
@@ -47,7 +46,18 @@ urlpatterns = [
     path('edit_course/<str:course_id>', HodView.edit_course, name='edit_course'),   
     path('edit_course_save', HodView.edit_course_save, name='edit_course_save'),   
     path('edit_subject/<str:subject_id>', HodView.edit_subject, name='edit_subject'),   
-    path('edit_subject_save', HodView.edit_subject_save, name='edit_subject_save'),   
-    # path('add_subject_save', HodView.add_subject_save, name='addsubjectsave'),    
+    path('edit_subject_save', HodView.edit_subject_save, name='edit_subject_save'),
+    path('manage_session', HodView.manage_session, name='manage_session'),   
+    path('manage_session_save', HodView.manage_session_save, name='manage_session_save'),
     
-]+static(settings.MEDIA_URL,document_root = settings.MEDIA_ROOT)+static(settings.STATIC_URL,document_root = settings.STATIC_ROOT)
+    # staff url paths  
+    path('staff_home', StaffView.staff_home, name='staff_home'),  
+    path('staff_take_attendance', StaffView.staff_take_attendance, name='staff_take_attendance'),  
+    path('get_students', StaffView.get_students, name='get_students'),  
+    path('save_attendance_data', StaffView.save_attendance_data, name='save_attendance_data'),  
+     
+    # student url paths  
+    path('student_home', StudentView.student_home, name='student_home'),       
+    path('logout_user', views.logout_user, name='logout_user'),  # Move this line here
+    
+] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT) + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

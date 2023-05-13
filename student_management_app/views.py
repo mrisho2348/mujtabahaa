@@ -2,6 +2,7 @@ from django.contrib.auth import logout,login
 from django.http import HttpResponse,HttpResponseRedirect
 from django.template import loader
 from django.shortcuts import render
+from django.urls import reverse
 from student_management_app.emailBackEnd import EmailBackend
 from django.views.decorators.csrf import csrf_protect
 from django.contrib import messages
@@ -21,11 +22,19 @@ def DoLogin(request):
   else:
     user = EmailBackend.authenticate(request,request.POST.get("email"),request.POST.get("password"))
     if user!=None:    
-      login(request,user)        
-      return HttpResponseRedirect("/admin_home")
+      login(request,user)  
+      if user.user_type=="1":      
+        return HttpResponseRedirect(reverse("admin_home"))
+      
+      elif user.user_type == "2":
+        return HttpResponseRedirect(reverse("staff_home"))
+      
+      else:
+        return HttpResponseRedirect(reverse("student_home"))
+    
     else:
       messages.error(request,"Invalid Login Details")
-      return HttpResponseRedirect("/")
+      return HttpResponseRedirect(reverse("admin_home"))
     
     
 def GetUserDetails(request):
@@ -38,6 +47,6 @@ def GetUserDetails(request):
   
 def logout_user(request):
   logout(request)
-  return HttpResponseRedirect("/")
+  return HttpResponseRedirect(reverse("login"))
     
   

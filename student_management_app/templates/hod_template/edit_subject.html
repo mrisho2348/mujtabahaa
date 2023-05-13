@@ -23,47 +23,8 @@
                       </div>
                       <!-- /.card-header -->
                       <!-- form start -->
-                      <form role="form" action="/edit_subject_save" method="POST">
-                        {% csrf_token %}
-                        <div class="card-body">
-                          <div class="form-group">
-                            <label >Subject Name</label>
-                            <input type="text" class="form-control"  placeholder="Enter Course name" name="subject_name" value="{{ subject.subject_name }}">
-                            <input type="hidden" value="{{subject.id}}" name="subject_id" class="form-control">
-                          </div> 
-                          <div class="form-group">
-                            <label >Course Name</label>
-                            <select class="form-control" name="course">
-                                {% for course in courses  %}
-                                    <option value="{{ course.id }}" {% if course_id == subject.course_id.id %} selected {% endif %}>{{ course.Course_name }}</option>
-                                {% endfor %}
-                            </select>
-                          </div>
-                          <div class="form-group">
-                            <label >Staff</label>
-                            <select class="form-control" name="staff">
-                                {% for staff in staffs  %}
-                                    <option value="{{ staff.id }}"  {% if staff_id == subject.staff_id.id %} selected {% endif %}>{{ staff.first_name }} {{ staff.last_name }}</option>
-                                {% endfor %}
-                            </select>
-                          </div>                        
-                        <!-- /.card-body -->        
-                        <div class="card-footer">
-                          <button type="submit" class="btn btn-primary btn-block">edit Subject</button>
-                        </div>
-                        {% if messages %}
-                        <div class="col-12">
-                          {% for message in messages %}
-                            {% if message.tags == 'error' %}
-                              <div class="alert alert-danger">{{ message }}</div>
-                            {% elif message.tags == 'success' %}
-                              <div class="alert alert-primary">{{ message }}</div>
-                            {% endif %}
-                          {% endfor %}
-                        </div>
-                      {% endif %}
-                    </div>
-                      </form>
+                      {% url 'edit_subject_save' as action_path %}
+                      {% include 'hod_template/form_template.html' with messages=messages forms=forms action_path=action_path button_text="Edit subject" %}
                     </div>
 
         

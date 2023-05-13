@@ -3,13 +3,13 @@ from django.contrib import messages
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render
 from django.core.files.storage import FileSystemStorage
-from student_management_app.forms import AddCourseForm, AddStaffForm, AddStudentForm, AddSubjectForm, EditStudentForm
-from student_management_app.models import Courses, CustomUser, Staffs, Students, Subject
+from student_management_app.forms import AddCourseForm, AddSessionYearForm, AddStaffForm, AddStudentForm, AddSubjectForm, EditStaffForm, EditStudentForm
+from student_management_app.models import Courses, CustomUser, SessionYearModel, Staffs, Students, Subject
 from django.core.exceptions import ObjectDoesNotExist
 
 
 
-def HodViews(request):
+def admin_home(request):
     return render(request,"hod_template/home_content.html")
 
 
@@ -123,8 +123,8 @@ def add_student_save(request):
             username=forms.cleaned_data["username"] 
             sex=forms.cleaned_data["sex"]
             course_id=forms.cleaned_data["course_name"] 
-            session_start=forms.cleaned_data["session_start"]
-            session_end=forms.cleaned_data["session_end"]  
+            session_year_id=forms.cleaned_data["session_year_id"]
+              
         
             if request.FILES.get("profile_pic"):
                profile_pic=request.FILES.get("profile_pic",False)  
@@ -137,10 +137,10 @@ def add_student_save(request):
             try:
                 user= CustomUser.objects.create_user(username=username,password=password,email=email,first_name=first_name,last_name=last_name,user_type=3)
                 user.students.address = address
+                session_id = SessionYearModel.objects.get(id=session_year_id)
+                user.students.session_id = session_id  
                 course_obj = Courses.objects.get(id=course_id)             
-                user.students.course_id = course_obj
-                user.students.session_start_year = session_start
-                user.students.session_end_year = session_end
+                user.students.course_id = course_obj                              
                 user.students.gender = sex
                 user.students.profile_pic =profile_pic_url             
                 user.save()
@@ -176,22 +176,34 @@ def manage_subject(request):
     subjects =Subject.objects.all() 
     return render(request,"hod_template/manage_subject.html",{"subjects":subjects})
   
-def edit_staff(request,staff_id):  
-    staffs=Staffs.objects.get(admin_id=staff_id)  
-    return render(request,"hod_template/edit_staff.html",{"staffs":staffs,"id":staff_id})  
+def edit_staff(request,staff_id): 
+    request.session['staff_id'] = staff_id 
+    staffs = Staffs.objects.get(admin = staff_id)
+    forms = EditStaffForm()
+    forms.fields['email'].initial = staffs.admin.email
+    forms.fields['first_name'].initial = staffs.admin.first_name
+    forms.fields['last_name'].initial = staffs.admin.last_name
+    forms.fields['username'].initial = staffs.admin.username
+    forms.fields['address'].initial = staffs.address
+    return render(request,"hod_template/edit_staff.html",{"forms":forms,"id":staff_id,"username":staffs.admin.username})     
 
 
 def edit_staff_save(request):
     if request.method != "POST":
         return HttpResponse("Method not allowed")
     
-    else:
-        staff_id = request.POST.get("staff_id")
-        first_name = request.POST.get("first_name")
-        last_name = request.POST.get("last_name")
-        email = request.POST.get("email")
-        address = request.POST.get("address")
-        username = request.POST.get("username")
+    
+    staff_id = request.session.get("staff_id")
+    if staff_id is None :
+        return HttpResponseRedirect(reverse("manage_staff"))
+    
+    forms = EditStaffForm(request.POST)    
+    if forms.is_valid():           
+        first_name = forms.cleaned_data["first_name"]
+        last_name = forms.cleaned_data["last_name"]
+        email = forms.cleaned_data["email"]
+        address = forms.cleaned_data["address"]
+        username = forms.cleaned_data["username"]
         
         try:
             user = CustomUser.objects.get(id=staff_id)
@@ -233,8 +245,8 @@ def edit_student_save(request):
         username = cleaned_data["username"]
         sex = cleaned_data["sex"]
         course_id = cleaned_data["course_name"]
-        session_start = cleaned_data["session_start"]
-        session_end = cleaned_data["session_end"]
+        session_year = cleaned_data["session_year_id"]
+        
 
         profile_pic_url = None
         profile_pic = request.FILES.get("profile_pic")
@@ -254,8 +266,8 @@ def edit_student_save(request):
             student = Students.objects.get(admin_id=student_id)
             student.address = address
             student.gender = sex
-            student.session_start_year = session_start
-            student.session_end_year = session_end
+            session_d = SessionYearModel.objects.get(id = session_year)
+            student.session_id = session_d
             course = Courses.objects.get(id=course_id)
             student.course_id = course
             if profile_pic_url:
@@ -275,7 +287,7 @@ def edit_student_save(request):
 
    
 def edit_student(request,student_id):
-    request.session['student_id'] = student_id     
+    request.session['student_id'] = student_id       
     students=Students.objects.get(admin=student_id)  
     forms = EditStudentForm()
     forms.fields['email'].initial  = students.admin.email    
@@ -283,26 +295,31 @@ def edit_student(request,student_id):
     forms.fields['last_name'].initial  = students.admin.last_name
     forms.fields['username'].initial  = students.admin.username
     forms.fields['address'].initial  = students.address
-    forms.fields['course_name'].initial  = students.course_id
+    forms.fields['course_name'].initial  = students.course_id.id
     forms.fields['sex'].initial  = students.gender
-    forms.fields['session_start'].initial  = students.session_start_year
-    forms.fields['session_end'].initial  = students.session_end_year
+    forms.fields['session_year_id'].initial  = students.session_id  
     forms.fields['profile_pic'].initial  = students.profile_pic
     return render(request,"hod_template/edit_student.html",{"forms":forms,"id":student_id,"username":students.admin.username})     
 
     
 def edit_course(request,course_id):  
-    courses=Courses.objects.get(id=course_id)  
-    return render(request,"hod_template/edit_course.html",{"courses":courses,"id": course_id})  
+    request.session['course_id'] = course_id
+    courses = Courses.objects.get(id = course_id)
+    forms = AddCourseForm() 
+    forms.fields['course'].initial = courses.Course_name
+    return render(request,"hod_template/edit_course.html",{"forms":forms,"id":course_id})  
 
 def edit_course_save(request):  
     if request.method!= "POST":
         return HttpResponse("Method not allowed")
     
-    else:
-        course_name = request.POST.get("course")
-        course_id = request.POST.get("course_id")
-        
+    course_id = request.session.get("course_id")
+    if course_id is None:
+        return HttpResponseRedirect(reverse("manage_course"))
+    
+    forms = AddCourseForm(request.POST)
+    if forms.is_valid():
+        course_name = forms.cleaned_data["course"]       
         try:
             course_modal = Courses.objects.get(id=course_id)
             course_modal.Course_name = course_name
@@ -320,20 +337,29 @@ def edit_course_save(request):
 
 
 def edit_subject(request,subject_id):  
-    subject=Subject.objects.get(id=subject_id)  
-    courses= Courses.objects.all()
-    staffs = CustomUser.objects.filter(user_type = 2)
-    return render(request,"hod_template/edit_subject.html",{"subject":subject,"staffs":staffs, "courses":courses,"id":subject_id}) 
+    request.session['subject_id'] = subject_id
+    subjects = Subject.objects.get(id = subject_id)
+    forms = AddSubjectForm() 
+    forms.fields['subject_name'].initial =subjects.subject_name
+    forms.fields['course_name'].initial = subjects.course_id.id
+    forms.fields['staff_name'].initial = subjects.staff_id.id
+    return render(request,"hod_template/edit_subject.html",{"forms":forms,"id":subject_id}) 
 
 def edit_subject_save(request):
     if request.method != "POST":
         return HttpResponse("Method not allowed")
-
-    else:
-        subject_id = request.POST.get("subject_id")
-        subject_name = request.POST.get("subject_name")
-        course_id = request.POST.get("course")
-        staff_id = request.POST.get("staff")
+    
+    subject_id = request.session.get("subject_id")
+    if subject_id is None:
+        return HttpResponseRedirect(reverse("manage_subject"))
+    
+    
+    forms = AddSubjectForm(request.POST)
+    if forms.is_valid():
+        subject_name = forms.cleaned_data["subject_name"]
+        course_id= forms.cleaned_data["course_name"]
+        staff_id = forms.cleaned_data["staff_name"]
+        
 
         try:
             subject_modal = Subject.objects.get(id=subject_id)
@@ -364,8 +390,32 @@ def edit_subject_save(request):
     return render(request,"hod_template/manage_subject.html",{"subjects":subjects})     
 
 
+def manage_session(request):
+    forms = AddSessionYearForm()
+    return render(request,"hod_template/manage_session.html",{"forms":forms})
 
-       
+  
+  
+def manage_session_save(request):
+    if request.method!= "POST":  
+        return HttpResponseRedirect(reverse("manage_session"))
+    
+    else:
+        forms = AddSessionYearForm(request.POST)
+        
+        if forms.is_valid():
+            session_start = forms.cleaned_data["session_start"]
+            session_end = forms.cleaned_data["session_end"] 
+            
+            try:                          
+               sessions = SessionYearModel(session_start_year=session_start,session_end_year=session_end)
+               sessions.save()
+               messages.success(request,"session year is successfully added")
+               return HttpResponseRedirect(reverse("manage_session"))
+
+            except:
+                messages.error(request,"add of session year failed")
+                return HttpResponseRedirect(reverse("manage_session"))
         
             
         
