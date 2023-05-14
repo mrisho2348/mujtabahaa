@@ -49,9 +49,6 @@ class Subject(models.Model):
 class Students(models.Model):
     id = models.AutoField(primary_key=True)
     admin = models.OneToOneField(CustomUser,on_delete=models.CASCADE)
-    # name = models.CharField(max_length=255)
-    # email = models.CharField(max_length=255)
-    # password = models.CharField(max_length=255)
     gender = models.CharField(max_length=255)
     session_id = models.ForeignKey(SessionYearModel,on_delete=models.CASCADE)
     profile_pic = models.FileField()
@@ -65,7 +62,7 @@ class Students(models.Model):
 class Attendance(models.Model):
     id = models.AutoField(primary_key=True)  
     subject_id = models.ForeignKey(Subject,on_delete=models.DO_NOTHING)
-    attendance_date = models.DateTimeField(auto_now_add=True)
+    attendance_date = models.DateField(auto_now_add=True)
     created_at = models.DateTimeField(auto_now_add=True)
     session_id = models.ForeignKey(SessionYearModel,on_delete=models.CASCADE)
     updated_at = models.DateTimeField(auto_now_add=True)  
