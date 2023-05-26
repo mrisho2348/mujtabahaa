@@ -23,6 +23,7 @@ from student_management_app import StudentView, views,HodView,StaffView
 urlpatterns = [
     path('', include('student_management_app.urls')),
     path('admin/', admin.site.urls),
+    path('accounts/',include('django.contrib.auth.urls')),
     path('', views.ShowLogin, name='login'),
     path('GetUserDetails', views.GetUserDetails, name='GetUserDetails'),
     path('dologin', views.DoLogin, name='DoLogin'),
@@ -49,6 +50,12 @@ urlpatterns = [
     path('edit_subject_save', HodView.edit_subject_save, name='edit_subject_save'),
     path('manage_session', HodView.manage_session, name='manage_session'),   
     path('manage_session_save', HodView.manage_session_save, name='manage_session_save'),
+    path('check_email_exist', HodView.check_email_exist, name='check_email_exist'),
+    path('check_username_exist', HodView.check_username_exist, name='check_username_exist'),
+    path('student_feedback_message', HodView.student_feedback_message, name='student_feedback_message'),
+    path('student_feedback_message_replied', HodView.student_feedback_message_replied, name='student_feedback_message_replied'),
+    path('staff_feedback_message_replied', HodView.staff_feedback_message_replied, name='staff_feedback_message_replied'),
+    path('staff_feedback_message', HodView.staff_feedback_message, name='staff_feedback_message'),
     
     # staff url paths  
     path('staff_home', StaffView.staff_home, name='staff_home'),  
@@ -59,9 +66,21 @@ urlpatterns = [
     path('get_student_attendance', StaffView.get_student_attendance, name='get_student_attendance'),  
     path('staff_update_attendance', StaffView.staff_update_attendance, name='staff_update_attendance'),  
     path('save_updateattendance', StaffView.save_updateattendance, name='save_updateattendance'),  
+    path('staff_apply_leave', StaffView.staff_apply_leave, name='staff_apply_leave'),  
+    path('staff_apply_leave_save', StaffView.staff_apply_leave_save, name='staff_apply_leave_save'),  
+    path('staff_sendfeedback', StaffView.staff_sendfeedback, name='staff_sendfeedback'),  
+    path('staff_sendfeedback_save', StaffView.staff_sendfeedback_save, name='staff_sendfeedback_save'),  
+    path('student_leave_view', StaffView.student_leave_view, name='student_leave_view'),  
+    path('staff_leave_view', StaffView.staff_leave_view, name='staff_leave_view'),  
      
     # student url paths  
     path('student_home', StudentView.student_home, name='student_home'),       
+    path('student_view_attendance', StudentView.student_view_attendance, name='student_view_attendance'),       
+    path('student_view_attendance_post', StudentView.student_view_attendance_post, name='student_view_attendance_post'),   
+    path('student_apply_leave', StudentView.student_apply_leave, name='student_apply_leave'),  
+    path('student_apply_leave_save', StudentView.student_apply_leave_save, name='student_apply_leave_save'),  
+    path('student_sendfeedback', StudentView.student_sendfeedback, name='student_sendfeedback'),  
+    path('student_sendfeedback_save', StudentView.student_sendfeedback_save, name='student_sendfeedback_save'),    
     path('logout_user', views.logout_user, name='logout_user'),  # Move this line here
     
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT) + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

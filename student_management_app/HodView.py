@@ -4,8 +4,9 @@ from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render
 from django.core.files.storage import FileSystemStorage
 from student_management_app.forms import AddCourseForm, AddSessionYearForm, AddStaffForm, AddStudentForm, AddSubjectForm, EditStaffForm, EditStudentForm
-from student_management_app.models import Courses, CustomUser, SessionYearModel, Staffs, Students, Subject
+from student_management_app.models import Courses, CustomUser, FeedBackStaff, FeedBackStudent, SessionYearModel, Staffs, Students, Subject
 from django.core.exceptions import ObjectDoesNotExist
+from django.views.decorators.csrf import csrf_exempt
 
 
 
@@ -418,4 +419,67 @@ def manage_session_save(request):
                 return HttpResponseRedirect(reverse("manage_session"))
         
             
-        
+@csrf_exempt
+def check_email_exist(request):
+    email = request.POST.get("email")
+    user_object = CustomUser.objects.filter(email=email).exists()
+    if user_object:
+        return HttpResponse(True)
+    
+    else:
+        return HttpResponse(False)
+    
+    
+@csrf_exempt
+def check_username_exist(request):
+    username = request.POST.get("username")
+    user_object = CustomUser.objects.filter(username=username).exists()
+    if user_object:
+        return HttpResponse(True)
+    
+    else:
+        return HttpResponse(False)
+
+
+def  student_feedback_message(request):
+    feedbacks = FeedBackStudent.objects.all()
+    return render(request,"hod_template/student_feedback_message.html",{"feedbacks":feedbacks})
+
+def staff_feedback_message(request):
+    feedbacks = FeedBackStaff.objects.all()
+    return render(request,"hod_template/staff_feedback_message.html",{"feedbacks":feedbacks})
+
+
+@csrf_exempt
+def student_feedback_message_replied(request):
+    feedback_id = request.POST.get("id")
+    feedback_message = request.POST.get("message")
+    try:    
+      feedback = FeedBackStudent.objects.get(id=feedback_id)
+      feedback.feedback_reply = feedback_message
+      feedback.save() 
+      return HttpResponse(True)
+    except:
+       return HttpResponse(False)  
+   
+            
+@csrf_exempt
+def staff_feedback_message_replied(request):
+    feedback_id = request.POST.get("id")
+    feedback_message = request.POST.get("message")
+    try:    
+      feedback = FeedBackStaff.objects.get(id=feedback_id)
+      feedback.feedback_reply = feedback_message
+      feedback.save() 
+      return HttpResponse(True)
+    except:
+       return HttpResponse(False)           
+   
+def student_leave_view(request):
+    pass
+
+
+
+def staff_leave_view(request):
+    pass
+       

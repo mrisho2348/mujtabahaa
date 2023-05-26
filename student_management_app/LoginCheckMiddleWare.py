@@ -39,7 +39,7 @@ class LoginCheckMiddleWare(MiddlewareMixin):
                 return HttpResponseRedirect(reverse("login"))   
         
         else:
-            if request.path == reverse("login") or request.path == reverse("DoLogin") or request.path == reverse("logout_user"):
+            if request.path == reverse("login") or request.path == reverse("DoLogin") or request.path == reverse("logout_user")  or modulename == "django.contrib.auth.views" :
                 pass
             
             else:

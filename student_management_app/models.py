@@ -94,7 +94,7 @@ class LeaveReportStaffs(models.Model):
      staff_id = models.ForeignKey(Staffs,on_delete=models.DO_NOTHING)
      leave_date = models.DateTimeField(auto_now_add=True)
      leave_message = models.TextField()
-     leave_status = models.BooleanField(default=False)    
+     leave_status = models.IntegerField(default=0)    
      created_at = models.DateTimeField(auto_now_add=True)
      updated_at = models.DateTimeField(auto_now_add=True)   
      objects = models.Manager()

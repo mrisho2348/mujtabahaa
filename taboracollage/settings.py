@@ -58,7 +58,7 @@ ROOT_URLCONF = 'taboracollage.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': ['student_management_app/templates'],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -136,7 +136,18 @@ STATIC_ROOT = os.path.join(BASE_DIR,"static")
 
 AUTH_USER_MODEL = 'student_management_app.CustomUser'
 AUTHENTICATION_BACKENDS = ['student_management_app.emailBackEnd.EmailBackend']
+# EMAIL_BACKEND = "django.core.mail.backends.bdtvjjdagryvnqeb.filebased.EmailBackend"
+# EMAIL_FILE_PATH = os.path.join(BASE_DIR,"sent_emails")
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
 
-DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_HOST_USER = 'mrishohamisi2348@gmail.com'
+EMAIL_HOST_PASSWORD = 'bdtvjjdagryvnqeb'
+EMAIL_USE_TLS = True
+DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
+
+DEFAULT_AUTO_FIELD = 'student management system <mrishohamisi2348@gmail.com>'
+
