@@ -11,7 +11,24 @@ from student_management_app.templatetags.custom_filters import strftime
 
 
 def student_home(request):
-    return render(request,"student_template/student_home.html")
+    student_object = Students.objects.get(admin=request.user.id)
+    attendance_present = AttendanceReport.objects.filter(student_id=student_object,status=True).count()
+    attendance_absent = AttendanceReport.objects.filter(student_id=student_object,status=False).count()
+    attendance_total = AttendanceReport.objects.filter(student_id=student_object).count()
+    course = Courses.objects.get(id=student_object.course_id.id)
+    subject_total = Subject.objects.filter(course_id=course).count()
+    subject_data = Subject.objects.filter(course_id=student_object.course_id)
+    subject_name = []
+    data_present = []
+    data_absent = []
+    for subject in subject_data:
+        attendance = Attendance.objects.filter(subject_id=subject.id)
+        attendance_present_count = AttendanceReport.objects.filter(attendance_id__in=attendance,status=True,student_id=student_object.id).count()
+        attendance_absent_count = AttendanceReport.objects.filter(attendance_id__in=attendance,status=False,student_id=student_object.id).count()
+        subject_name.append(subject.subject_name)
+        data_present.append(attendance_present_count)
+        data_absent.append(attendance_absent_count)
+    return render(request,"student_template/student_home.html",{"attendance_total":attendance_total,"attendance_present":attendance_present,"attendance_absent":attendance_absent,"subject_total":subject_total,"subject_name":subject_name,"data_present":data_present,"data_absent":data_absent})
 
 
 
@@ -92,3 +109,40 @@ def student_apply_leave_save(request):
         except:
             messages.error(request,"failed for staff to apply for leave")
             return HttpResponseRedirect(reverse("student_apply_leave"))
+        
+        
+
+
+def  student_profile(request):
+    user = CustomUser.objects.get(id=request.user.id)
+    students = Students.objects.get(admin=user)
+    return render(request,"student_template/student_profile.html",{"user":user,"students":students})  
+
+def student_profile_save(request):
+    if request.method!="POST":
+        return HttpResponseRedirect(reverse("student_profile"))
+    
+    else:
+       first_name = request.POST.get("first_name")
+       last_name = request.POST.get("last_name")
+       password = request.POST.get("password")
+       address = request.POST.get("address")
+       try:           
+          customuser = CustomUser.objects.get(id=request.user.id)
+          customuser.first_name = first_name
+          customuser.last_name = last_name
+          if password!= "" and password!=None:
+              customuser.set_password(password)     
+                         
+          customuser.save()
+          students = Students.objects.get(admin=customuser.id)
+          students.address = address
+          messages.success(request,"profile is successfully edited")
+          return HttpResponseRedirect(reverse("student_profile"))
+      
+       except:
+            messages.error(request,"editing  of profile  failed")
+            return HttpResponseRedirect(reverse("student_profile"))
+        
+
+    
