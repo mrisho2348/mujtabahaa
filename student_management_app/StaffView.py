@@ -10,7 +10,49 @@ from student_management_app.models import Attendance, AttendanceReport, Courses,
 
 
 def staff_home(request):
-    return render(request,"staff_template/staff_home.html")
+    # Fetching all the students under the staffs
+    subjects = Subject.objects.filter(staff_id=request.user.id)
+    course_id_list = []
+    for subject in subjects:
+        course = Courses.objects.get(id = subject.course_id.id)
+        course_id_list.append(course)
+    
+    # removing  duplicate     
+    final_course = []
+    for course_list in course_id_list:
+        if course_list not in final_course:
+            final_course.append(course_list)
+    
+    student_count = Students.objects.filter(course_id__in=final_course).count()    
+    
+        # Fetching all attendance  under the staff
+    attendance_count = Attendance.objects.filter(subject_id__in=subjects).count()  
+    
+    # Fetch all approve leave\
+    staff = Staffs.objects.get(admin=request.user.id)   
+    leave_count = LeaveReportStaffs.objects.filter(staff_id=staff.id,leave_status=1).count()  
+    subject_count = subjects.count()
+    
+    #fetching attendance data by subject
+    subject_list = []
+    attendance_list = []
+    for subject in subjects:
+        attendance_count1 = Attendance.objects.filter(subject_id=subject.id).count()
+        subject_list.append(subject.subject_name)
+        attendance_list.append(attendance_count1)
+     
+    student_list = []
+    student_list_attendance_present = []
+    student_list_attendance_absent = []
+    student_attendance = Students.objects.filter(course_id__in = final_course)
+    for student in student_attendance:         
+         attendance_present_count = AttendanceReport.objects.filter(status=True,student_id=student.id).count()
+         attendance_absent_count = AttendanceReport.objects.filter(status=False,student_id=student.id).count()
+         student_list.append(student.admin.username)
+         student_list_attendance_present.append(attendance_present_count)
+         student_list_attendance_absent.append(attendance_absent_count)
+         
+    return render(request,"staff_template/staff_home.html",{"student_count":student_count,"attendance_count":attendance_count,"leave_count":leave_count,"subject_count":subject_count,"subject_list":subject_list,"attendance_list":attendance_list,"student_list":student_list,"student_list_attendance_present":student_list_attendance_present,"student_list_attendance_absent":student_list_attendance_absent})
 
 def staff_take_attendance(request):
     subjects = Subject.objects.filter(staff_id=request.user.id)    
