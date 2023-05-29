@@ -26,7 +26,9 @@ class Staffs(models.Model):
     id = models.AutoField(primary_key=True)
     admin = models.OneToOneField(CustomUser,on_delete=models.CASCADE)
     address = models.TextField()
-    created_at = models.DateTimeField(auto_now_add=True)
+    created_at = models.DateTimeField(auto_now_add=True) 
+    updated_at = models.DateTimeField(auto_now_add=True)      
+    fcm_token = models.TextField(default="")
     objects = models.Manager()
 
 class Courses(models.Model):
@@ -55,6 +57,7 @@ class Students(models.Model):
     address = models.TextField()
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now_add=True)    
+    fcm_token = models.TextField(default="")
     course_id = models.ForeignKey(Courses,on_delete=models.DO_NOTHING) 
     objects = models.Manager()
         

@@ -151,8 +151,8 @@ DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
 
 
 
-# DEFAULT_AUTO_FIELD = 'django.db.models.AutoField'
+DEFAULT_AUTO_FIELD = 'django.db.models.AutoField'
 
 
-DEFAULT_AUTO_FIELD = 'student management system <mrishohamisi2348@gmail.com>'
+# DEFAULT_AUTO_FIELD = 'student management system <mrishohamisi2348@gmail.com>'
 
