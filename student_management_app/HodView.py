@@ -8,7 +8,7 @@ from student_management_app.forms import AddCourseForm, AddSessionYearForm, AddS
 from student_management_app.models import Attendance, AttendanceReport, Courses, CustomUser, FeedBackStaff, FeedBackStudent, LeaveReportStaffs, LeaveReportStudent, SessionYearModel, Staffs, Students, Subject
 from django.core.exceptions import ObjectDoesNotExist
 from django.views.decorators.csrf import csrf_exempt
-
+from django.core.paginator import Paginator
 
 
 def admin_home(request):
@@ -208,23 +208,53 @@ def add_student_save(request):
 
 def add_student(request):    
     forms  = AddStudentForm()
-    return render(request,"hod_template/add_student.html",{"forms":forms})   
+    return render(request,"hod_template/add_student.html",{"forms":forms})  
+
+def single_student_detail(request,student_id):
+    return render(request,"hod_template/student_details.html")  
 
   
-def manage_student(request):  
-    students=Students.objects.all()  
-    return render(request,"hod_template/manage_student.html",{"students":students})   
+def manage_student(request):
+    per_page = request.GET.get('per_page', 3)  # Get the number of items to display per page from the request
+    students = Students.objects.all()
+    paginator = Paginator(students, per_page)
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+    return render(request, "hod_template/manage_student.html", {"students": students, "page_obj": page_obj})
+ 
+def student_list(request):
+    search_query = request.GET.get('search', '')
+    students = Students.objects.all()
+    
+    if search_query:
+        students = students.filter(registration_number__icontains=search_query)
+    
+    paginator = Paginator(students, per_page=10)
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+    
+    return render(request, "paginator.html", {"students": students, "page_obj": page_obj})  
   
 def manage_course(request):  
-    courses=Courses.objects.all()  
+    courses=Courses.objects.all()      
     return render(request,"hod_template/manage_course.html",{"courses":courses})   
   
-def manage_staff(request):  
-    staffs=Staffs.objects.all()  
-    return render(request,"hod_template/manage_staff.html",{"staffs":staffs})  
-def manage_subject(request):
+def manage_staff(request):       
+    per_page = request.GET.get('per_page', 3)  # Get the number of items to display per page from the request
+    staffs=Staffs.objects.all() 
+    paginator = Paginator(staffs, per_page)
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+    return render(request,"hod_template/manage_staff.html",{"staffs":staffs,"page_obj":page_obj})  
+
+
+def manage_subject(request):   
+    per_page = request.GET.get('per_page', 3)  # Get the number of items to display per page from the request
     subjects =Subject.objects.all() 
-    return render(request,"hod_template/manage_subject.html",{"subjects":subjects})
+    paginator = Paginator(subjects, per_page)
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+    return render(request,"hod_template/manage_subject.html",{"subjects":subjects,"page_obj":page_obj})
   
 def edit_staff(request,staff_id): 
     request.session['staff_id'] = staff_id 

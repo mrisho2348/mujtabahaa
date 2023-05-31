@@ -2,9 +2,9 @@
 <aside class="main-sidebar sidebar-dark-primary elevation-4">
     <!-- Brand Logo -->
     <a href="#" class="brand-link">
-      <img src="{% static 'dist/img/LogoNembo.jfif' %}" alt="Tabora Logo" class="brand-image img-circle elevation-3"
+      <img src="{% static 'dist/img/LogoNembo.jpg' %}" alt="Tabora Logo" class="brand-image img-circle elevation-3"
            style="opacity: .8">
-      <span class="brand-text font-weight-light">Tabora Teachaer's Collage </span>
+      <span class="brand-text font-weight-light">madratul mujtabahaa </span>
     </a>
 
     <!-- Sidebar -->
@@ -18,67 +18,175 @@
           <a href="{% url 'staff_profile' %}" class="d-block">{{user.username}}</a>
         </div>
       </div>
+  <!-- Sidebar Menu -->
+  <nav class="mt-2">
+    <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
+      <!-- Add icons to the links using the .nav-icon class
+           with font-awesome or any other icon font library -->
+
+      <li class="nav-item">
+        {% url 'staff_home' as staff_home %}
+        <a href="{% url 'staff_home' %}" class="nav-link {% if request.path == staff_home %} active {% endif %}">
+
+          <i class="nav-icon fas fa-th"></i>
+          <p>
+            HOME
+            {% comment %} <span class="right badge badge-danger">New</span> {% endcomment %}
+          </p>
+        </a>
+      </li> 
+    <!-- Brand Logo -->
+  
+
+    <!-- Sidebar -->
+    <div class="sidebar">
 
       <!-- Sidebar Menu -->
       <nav class="mt-2">
-        <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
-          <!-- Add icons to the links using the .nav-icon class
-               with font-awesome or any other icon font library -->
-
+        <ul class="nav nav-pills nav-sidebar flex-column"
+          data-widget="treeview" role="menu" data-accordion="false">
           <li class="nav-item">
-             {% url 'staff_home' as staff_home %}
-            <a href="{% url 'staff_home' %}" class="nav-link {% if request.path == staff_home %} active {% endif %}">
-              <i class="nav-icon fas fa-th"></i>
-              <p>
-               Home
-                {% comment %} <span class="right badge badge-danger">New</span> {% endcomment %}
-              </p>
-            </a>
-          </li>
-          <li class="nav-item">
-             {% url 'staff_take_attendance' as staff_take_attendance %}
+            {% url 'staff_take_attendance' as staff_take_attendance %}
             <a href="{% url 'staff_take_attendance' %}" class="nav-link {% if request.path == staff_take_attendance %} active {% endif %}">
-              <i class="nav-icon fas fa-th"></i>
+
+              <i class="nav-icon fas fa-graduation-cap"></i>
               <p>
-               Take Attendance
-                {% comment %} <span class="right badge badge-danger">New</span> {% endcomment %}
+                Take Attendance
               </p>
             </a>
           </li>
           <li class="nav-item">
-             {% url 'staff_update_attendance' as staff_update_attendance %}
+            {% url 'staff_update_attendance' as staff_update_attendance %}
             <a href="{% url 'staff_update_attendance' %}" class="nav-link {% if request.path == staff_update_attendance %} active {% endif %}">
-              <i class="nav-icon fas fa-th"></i>
+
+              <i class="nav-icon fas fa-graduation-cap"></i>
               <p>
-               View Attendance
-                {% comment %} <span class="right badge badge-danger">New</span> {% endcomment %}
+                View Attendance
               </p>
             </a>
-          </li>
+          </li>        
           <li class="nav-item">
-             {% url 'staff_apply_leave' as staff_apply_leave %}
-            <a href="{% url 'staff_apply_leave' %}" class="nav-link {% if request.path == staff_apply_leave %} active {% endif %}">
-              <i class="nav-icon fas fa-th"></i>
-              <p>
-               Apply for Leave
-                {% comment %} <span class="right badge badge-danger">New</span> {% endcomment %}
-              </p>
-            </a>
-          </li>
-          <li class="nav-item">
-             {% url 'staff_sendfeedback' as staff_sendfeedback %}
+            {% url 'staff_sendfeedback' as staff_sendfeedback %}
             <a href="{% url 'staff_sendfeedback' %}" class="nav-link {% if request.path == staff_sendfeedback %} active {% endif %}">
-              <i class="nav-icon fas fa-th"></i>
+
+              <i class="nav-icon fas fa-graduation-cap"></i>
               <p>
-               Send FeedBack
-                {% comment %} <span class="right badge badge-danger">New</span> {% endcomment %}
+                Send FeedBack
+              </p>
+            </a>
+          </li>        
+        
+          <li class="nav-item">
+            {% url 'staff_apply_leave' as staff_apply_leave %}
+            <a href="{% url 'staff_apply_leave' %}" class="nav-link {% if request.path == staff_apply_leave %} active {% endif %}">
+
+              <i class="nav-icon fas fa-graduation-cap"></i>
+              <p>
+                Apply for Leave
+              </p>
+            </a>
+          </li>        
+        
+        
+          <li class="nav-header">Results</li>
+          <li class="nav-item">
+            <a href="#" class="nav-link">
+              <i class="nav-icon fas fa-money-bill-alt"></i>
+              <p>
+                Create Results
               </p>
             </a>
           </li>
-      
-          
+          <li class="nav-item">
+            <a href="#" class="nav-link">
+              <i class="nav-icon fas fa-money-bill-alt"></i>
+              <p>
+                Update Results
+              </p>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a href="#" class="nav-link">
+              <i class="nav-icon fas fa-money-bill-alt"></i>
+              <p>
+                View Results
+              </p>
+            </a>
+          </li>
+
+          <li class="nav-header">Others</li>
+          <li class="nav-item has-treeview">
+            <a href="#" class="nav-link">
+              <i class="nav-icon fas fa-copy"></i>
+              <p>
+                Management
+                <i class="fas fa-angle-left right"></i>
+              </p>
+            </a>
+            <ul class="nav nav-treeview">
+              <li class="nav-item">
+                <a href="#" class="nav-link">
+                  <i class="nav-icon fas fa-bars"></i>
+                  <p>
+                    Sessions
+                  </p>
+                </a>
+              </li>
+              <li class="nav-item">
+                <a href="#" class="nav-link">
+                  <i class="nav-icon fas fa-bars"></i>
+                  <p>
+                    Terms
+                    <i class="right"></i>
+                  </p>
+                </a>
+              </li>
+              <li class="nav-item">
+                {% url 'manage_subject' as manage_subject %}
+                {% url 'edit_subject' subject_id=id as edit_subject %}
+                <a href="{% url 'manage_subject' %}" class="nav-link  {% if request.path == manage_subject %}active{% endif %}{% if request.path == edit_subject %} active {% endif %} ">
+                  <i class="nav-icon fas fa-bars"></i>
+                  <p>
+                    Subjects
+                  </p>
+                </a>
+              </li>
+              <li class="nav-item">
+                <a href="#" class="nav-link">
+                  <i class="nav-icon fas fa-bars"></i>
+                  <p>
+                    Classes
+                  </p>
+                </a>
+              </li>
+              <li class="nav-item">
+                {% url 'admin_view_attendance' as admin_view_attendance %}
+                <a href="{% url 'admin_view_attendance' %}" class="nav-link  {% if request.path == admin_view_attendance %}active{% endif %}">
+                  <i class="nav-icon fas fa-bars"></i>
+                  <p>
+                    View Attendance
+                  </p>
+                </a>
+              </li>
+            </ul>
+          </li>
+          <li class="nav-item">
+            <a href="#" class="nav-link">
+              <i class="nav-icon fas fa-cog"></i>
+              <p>
+                Settings
+              </p>
+            </a>
+          </li>
+
+
         </ul>
       </nav>
+      <!-- /.sidebar-menu -->
+    </div>
+    <!-- /.sidebar -->
+  </aside>
+
       <!-- /.sidebar-menu -->
     </div>
     <!-- /.sidebar -->

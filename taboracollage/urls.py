@@ -68,6 +68,8 @@ urlpatterns = [
     path('admin_save_updateattendance', HodView.admin_save_updateattendance, name='admin_save_updateattendance'), 
     path('admin_profile', HodView.admin_profile, name='admin_profile'), 
     path('edit_profile_save', HodView.edit_profile_save, name='edit_profile_save'), 
+    path('single_student_detail/<str:student_id>', HodView.single_student_detail, name='single_student_detail'),
+    path('students', HodView.student_list, name='student-list'), 
     
     # staff url paths  
     path('staff_home', StaffView.staff_home, name='staff_home'),  

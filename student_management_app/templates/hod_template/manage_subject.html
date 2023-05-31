@@ -1,72 +1,112 @@
- 
 {% extends 'hod_template/base_template.html' %}
 {% block page_title %}
-        Manage subject    
+   All  Subjects    
 {% endblock page_title %}
+{% block breadcrumb %}
+    <a class="btn btn-primary" href="{% url 'addsubject' %}">
+        <i class="fas fa-plus"></i> New subjects
+    </a>
+    <a class="btn btn-primary" href="#">
+        <i class="fas fa-upload"></i> Upload subjects
+    </a>
+{% endblock breadcrumb %}
 {% block main_content %}
-{% load static %}
-<section class="content">
-    <div class="container-fluid">
-        <div class="content-wrappe">
-            <!-- Content Header (Page header) -->    
-        
-            <!-- Main content -->
-            <section class="content">
-              <div class="container-fluid">
-                <div class="row">
-                  <!-- left column -->
-                  <div class="col-md-12">
-                    <!-- general form elements -->
-                    <div class="card card-primary">
-                      <div class="card-header">
-                        <h3 class="card-title">subject Details</h3>
-                      </div>
-                      <div class="card-body table-responsive p-0">
-                        <table class="table table-hover text-nowrap">
-                          <thead>
-                            <tr>
-                              <th>ID</th>                          
-                              <th>Subject Name</th>                          
-                              <th>Course Name</th>
-                              <th>Course Id </th>                          
-                              <th>Staff Name</th>                                                      
-                              <th>Action</th>
-                            </tr>
-                          </thead>
-                          <tbody>
-                            {% for subject in subjects %}
-                            <tr>
-                                 <td>{{subject.id}}</td>                    
-                                 <td>{{subject.subject_name}}</td>                    
-                                 <td>{{subject.course_id.Course_name}}</td>                    
-                                 <td>{{subject.course_id.id}}</td>                    
-                                 <td>{{subject.staff_id.first_name}} {{subject.staff_id.last_name}}</td>                    
-                                <td><a href="{% url 'edit_subject' subject_id=subject.id %}" class="btn btn-success">Edit</a>
-                       </td>
-                         
-                       
-                            {% endfor %}                        
-                  
-                          </tbody>
-                        </table>
-                      </div>
-                      
-                    </div>
-                      </form>
-                    </div>
-
-        
+<div class="table-responsive">
+  <div class="table-responsive">
+    <div class="row">
+      <div class="col-md-3 ">
+        <form method="GET" action="{% url 'manage_student' %}">
+            <div class="input-group ">              
+                <input type="number" name="per_page" class="form-control" placeholder="Items per page" aria-label="Items per page" aria-describedby="per-page-btn" min="1">
+                <div class="input-group-prepend">
+                  <button class="btn btn-primary mr-3 btn-sm" type="submit" id="per-page-btn">Set</button>
+              </div>
+            </div>
+        </form>
+        <p>Show <strong>{{ page_obj.paginator.per_page }}</strong> Entries</p>
+    </div>
+        <div class="col-md-6 ml-5">
+            <form method="GET" action="{% url 'student-list' %}">
+                <div class="input-group mb-3">                
+                    <input type="text" name="search" class="form-control" placeholder="Search by subject name" aria-label="Search" aria-describedby="search-btn">
+                    <div class="input-group-prepend">
+                      <button class="btn btn-primary" type="submit" id="search-btn">Search</button>
                   </div>
-
-                  </div>
-                  <!--/.col (right) -->
                 </div>
-             
-              
-            </section>
-            <!-- /.content -->
-          </div>
-    </div><!-- /.container-fluid -->
-  </section>
+            </form>
+        </div>
+ 
+    </div>
+</div>
 
-  {% endblock main_content %}
+    <table class="table table-hover text-nowrap table-responsive-sm table-bordered table-striped table-sm">
+      <thead>
+        <tr>
+          <th>ID</th>                          
+          <th>Subject Name</th>                          
+          <th>Course Name</th>
+          <th>Course Id </th>                          
+          <th>Staff Name</th>                                                      
+          <th>Action</th>
+        </tr>
+      </thead>
+
+
+        <tbody>
+            {% for subject in page_obj %}
+            <tr>
+        
+              <td>{{subject.id}}</td>                    
+              <td>{{subject.subject_name}}</td>                    
+              <td>{{subject.course_id.Course_name}}</td>                    
+              <td>{{subject.course_id.id}}</td>                    
+              <td>{{subject.staff_id.first_name}} {{subject.staff_id.last_name}}</td>                    
+
+                <td class="text-center">
+                    <a href="#">
+                        <button type="button" class="btn btn-light border btn-sm"><i class="fa fa-eye text-dark"></i></button>
+                    </a>
+                    <a href="#">
+                        <button type="button" class="btn btn-primary btn-sm"><i class="fa fa-edit text-white"></i></button>
+                    </a>
+                    <a href="#">
+                        <button type="button" class="btn btn-danger btn-sm" onclick="if(confirm('Are you sure to delete this student?') === false) event.preventDefault()"><i class="fa fa-trash"></i></button>
+                    </a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+    {% if page_obj.has_other_pages %}
+    <div aria-label="pagination">
+        <ul class="pagination justify-content-center">
+            {% if page_obj.has_previous %}
+            <li class="page-item">
+                <a class="page-link" href="?page={{ page_obj.previous_page_number }}" tabindex="-1">Previous</a>
+            </li>
+            {% endif %}
+    
+            {% for page in page_obj.paginator.page_range %}
+    
+            {% if page_obj.number == page %}
+            <li class="page-item active" aria-current="page">
+                <span class="page-link">{{ page }}<span class="sr-only">(current)</span>
+                </span>
+            </li>
+            {% else %}
+            <li class="page-item"><a class="page-link" href="?page={{ page }}">{{ page }}</a></li>
+            {% endif %}
+    
+            {% endfor %}
+    
+            {% if page_obj.has_next %}
+            <li class="page-item">
+                <a class="page-link" href="?page={{ page_obj.next_page_number }}">Next</a>
+            </li>
+            {% endif %}
+        </ul>
+    </div>
+    {% endif %}
+{% endblock main_content %}
