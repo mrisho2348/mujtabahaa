@@ -6,7 +6,7 @@ from django.shortcuts import render
 from django.urls import reverse
 from django.contrib import messages
 
-from student_management_app.models import Attendance, AttendanceReport, Courses, CustomUser, FeedBackStudent, LeaveReportStudent, Students, Subject
+from student_management_app.models import Attendance, AttendanceReport,  CustomUser, FeedBackStudent, LeaveReportStudent, Students, Subject
 from student_management_app.templatetags.custom_filters import strftime
 
 
@@ -15,7 +15,7 @@ def student_home(request):
     attendance_present = AttendanceReport.objects.filter(student_id=student_object,status=True).count()
     attendance_absent = AttendanceReport.objects.filter(student_id=student_object,status=False).count()
     attendance_total = AttendanceReport.objects.filter(student_id=student_object).count()
-    course = Courses.objects.get(id=student_object.course_id.id)
+    # course = Courses.objects.get(id=student_object.course_id.id)
     subject_total = Subject.objects.filter(course_id=course).count()
     subject_data = Subject.objects.filter(course_id=student_object.course_id)
     subject_name = []

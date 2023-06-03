@@ -6,22 +6,22 @@ from django.views.decorators.csrf import csrf_exempt
 from rest_framework import serializers
 from django.contrib import messages
 
-from student_management_app.models import Attendance, AttendanceReport, Courses, CustomUser, FeedBackStaff, LeaveReportStaffs, SessionYearModel, Staffs, Students, Subject
+from student_management_app.models import Attendance, AttendanceReport, CustomUser, FeedBackStaff, LeaveReportStaffs, SessionYearModel, Staffs, Students, Subject
 
 
 def staff_home(request):
     # Fetching all the students under the staffs
     subjects = Subject.objects.filter(staff_id=request.user.id)
-    course_id_list = []
-    for subject in subjects:
-        course = Courses.objects.get(id = subject.course_id.id)
-        course_id_list.append(course)
+    # course_id_list = []
+    # for subject in subjects:
+    #     course = Courses.objects.get(id = subject.course_id.id)
+    #     course_id_list.append(course)
     
     # removing  duplicate     
-    final_course = []
-    for course_list in course_id_list:
-        if course_list not in final_course:
-            final_course.append(course_list)
+    # final_course = []
+    # for course_list in course_id_list:
+    #     if course_list not in final_course:
+    #         final_course.append(course_list)
     
     student_count = Students.objects.filter(course_id__in=final_course).count()    
     

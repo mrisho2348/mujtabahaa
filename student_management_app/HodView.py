@@ -4,45 +4,38 @@ from django.contrib import messages
 from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
 from django.shortcuts import render
 from django.core.files.storage import FileSystemStorage
-from student_management_app.forms import AddCourseForm, AddSessionYearForm, AddStaffForm, AddStudentForm, AddSubjectForm, EditStaffForm, EditStudentForm
-from student_management_app.models import Attendance, AttendanceReport, Courses, CustomUser, FeedBackStaff, FeedBackStudent, LeaveReportStaffs, LeaveReportStudent, SessionYearModel, Staffs, Students, Subject
+from student_management_app.forms import  AddSessionYearForm, AddStaffForm, AddStudentForm, AddSubjectForm, EditStaffForm, EditStudentForm
+from student_management_app.models import Attendance, AttendanceReport, CustomUser, FeedBackStaff, FeedBackStudent, LeaveReportStaffs, LeaveReportStudent, SessionYearModel, Staffs, Students, Subject
 from django.core.exceptions import ObjectDoesNotExist
 from django.views.decorators.csrf import csrf_exempt
 from django.core.paginator import Paginator
+from django.core.exceptions import ValidationError
+from django.shortcuts import render, redirect
 
 
 def admin_home(request):
-    student_count = Students.objects.all().count()
+  
     staff_count = Staffs.objects.all().count()
     subject_count = Subject.objects.all().count()
-    course_count = Courses.objects.all().count()
-    course_all = Courses.objects.all()
-    course_name_list = []
+   
     subject_count_list = []
-    student_count_in_course_list = []
-    for course in course_all:
-        subject = Subject.objects.filter(course_id = course.id).count()
-        student = Students.objects.filter(course_id=course.id).count()
-        course_name_list.append(course.Course_name)
-        subject_count_list.append(subject)
-        student_count_in_course_list.append(student)
+
         
     subject_all = Subject.objects.all()
     subject_list = []
     student_count_in_subject_list = []
     for subject in subject_all:
-          course = Courses.objects.get(id=subject.course_id.id)  
-          students_count = Students.objects.filter(course_id=course.id).count()
+     
           subject_list.append(subject.subject_name)
-          student_count_in_subject_list.append(students_count)
+      
           
     staff_all = Staffs.objects.all()
     attendance_present_staff_list = []
     attendance_absent_staff_list = []
     staff_name_list = []
     for staff in staff_all:
-        course_id = Subject.objects.filter(staff_id=staff.admin.id) 
-        attendance = Attendance.objects.filter(subject_id__in=course_id ).count()
+        couse_id = Subject.objects.filter(staff_id=staff.admin.id) 
+        attendance = Attendance.objects.filter(subject_id__in=couse_id ).count()
         leaves = LeaveReportStaffs.objects.filter(staff_id=staff.id,leave_status=1).count()
         attendance_present_staff_list.append(attendance) 
         attendance_absent_staff_list.append(leaves) 
@@ -60,8 +53,51 @@ def admin_home(request):
         attendance_present_student_list.append(attendance) 
         attendance_absent_student_list.append(leaves+absent) 
         student_name_list.append(student.admin.username)  
-    return render(request,"hod_template/home_content.html",{"student_count":student_count,"staff_count":staff_count,"subject_count":subject_count,"course_count":course_count,"course_name_list":course_name_list,"subject_count_list":subject_count_list,"student_count_in_course_list":student_count_in_course_list,"subject_list":subject_list,"student_count_in_subject_list":student_count_in_subject_list,"attendance_present_staff_list":attendance_present_staff_list,"attendance_absent_staff_list":attendance_absent_staff_list,"staff_name_list":staff_name_list,"student_name_list":student_name_list,"attendance_present_student_list":attendance_present_student_list,"attendance_absent_student_list":attendance_absent_student_list})
+    return render(request,"hod_template/home_content.html",{"staff_count":staff_count,"subject_count":subject_count,"subject_count_list":subject_count_list,"subject_list":subject_list,"student_count_in_subject_list":student_count_in_subject_list,"attendance_present_staff_list":attendance_present_staff_list,"attendance_absent_staff_list":attendance_absent_staff_list,"staff_name_list":staff_name_list,"student_name_list":student_name_list,"attendance_present_student_list":attendance_present_student_list,"attendance_absent_student_list":attendance_absent_student_list})
 
+
+
+def get_class_choices(request):
+    segment = request.GET.get('segment')
+
+    SCHOOL_SEGMENT_CHOICES = (
+        ("Nursery", "Nursery Level"),
+        ("Primary", "Primary Level"),
+        ("Secondary", "Secondary Level"),
+    )
+
+    NURSERY_CLASS_CHOICES = [
+        ("Baby", "Baby"),
+        ("KG1", "KG1"),
+        ("KG2", "KG2")
+    ]
+
+    PRIMARY_CLASS_CHOICES = [
+        ("I", "I"),
+        ("II", "II"),
+        ("III", "III"),
+        ("IV", "IV"),
+        ("V", "V"),
+        ("VI", "VI")
+    ]
+
+    SECONDARY_CLASS_CHOICES = [
+        ("Form I", "Form I"),
+        ("Form II", "Form II"),
+        ("Form III", "Form III"),
+        ("Form IV", "Form IV")
+    ]
+
+    if segment == "Nursery":
+        choices = NURSERY_CLASS_CHOICES
+    elif segment == "Primary":
+        choices = PRIMARY_CLASS_CHOICES
+    elif segment == "Secondary":
+        choices = SECONDARY_CLASS_CHOICES
+    else:
+        choices = []
+
+    return JsonResponse({'choices': choices})
 
 def add_staff(request):  
     forms = AddStaffForm()  
@@ -96,30 +132,10 @@ def add_staff_save(request):
             forms = AddStaffForm(request.POST)   
             return render(request,"hod_template/add_student.html",{"forms":forms})     
         
-def add_course_save(request):
-    if request.method!= "POST":
-        return HttpResponse("Method not allowed")
-    
-    else:
-        forms = AddCourseForm(request.POST,request.FILES)
-        
-        if forms.is_valid():            
-            course=forms.cleaned_data["course"]
-            try:            
-            # course_model = Courses.objects.create()
-              course_model = Courses(Course_name = course)
-              course_model.save()
-              messages.success(request,"course Successfully added")
-              return HttpResponseRedirect(reverse("addcourse"))  
-          
-            except:  
-                messages.error(request,"failed to add course")
-                return HttpResponseRedirect(reverse("addcourse"))
+
         
 
-def add_course(request):
-    forms = AddCourseForm()
-    return render(request,"hod_template/add_course.html",{"forms":forms})   
+  
 
 
  
@@ -130,22 +146,21 @@ def add_subject_save(request):
     else:        
         forms = AddSubjectForm(request.POST)
         if forms.is_valid():
-            subject_name = forms.cleaned_data["subject_name"]
-            course_id = forms.cleaned_data["course_name"]
+            subject_name = forms.cleaned_data["subject_name"]            
             staff_id = forms.cleaned_data["staff_name"]
             
             try:
-                course = Courses.objects.get(id=course_id)
+                
                 staff = CustomUser.objects.get(id=staff_id)
                 
-                subject = Subject(subject_name=subject_name, course_id=course, staff_id=staff)
+                subject = Subject(subject_name=subject_name, staff_id=staff)
                 subject.save()
                 
                 messages.success(request, "Subject successfully added")
                 return HttpResponseRedirect(reverse("addsubject"))  
             
             except ObjectDoesNotExist:
-                messages.error(request, "Failed to add subject. Course or staff not found.")
+                messages.error(request, "Failed to add subject.  or staff not found.")
                 return HttpResponseRedirect(reverse("addsubject"))
             
             except Exception as e:
@@ -159,56 +174,169 @@ def add_subject(request):
                
  
 def add_student_save(request):
-    if request.method!= "POST":
-        return HttpResponse("Method not allowed")    
-    else:
-        forms = AddStudentForm(request.POST,request.FILES)
-        
-        if forms.is_valid():            
-            first_name=forms.cleaned_data["first_name"]
-            last_name=forms.cleaned_data["last_name"]
-            email=forms.cleaned_data["email"]
-            password=forms.cleaned_data["password"]
-            address=forms.cleaned_data["address"]
-            username=forms.cleaned_data["username"] 
-            sex=forms.cleaned_data["sex"]
-            course_id=forms.cleaned_data["course_name"] 
-            session_year_id=forms.cleaned_data["session_year_id"]
-              
-        
-            if request.FILES.get("profile_pic"):
-               profile_pic=request.FILES.get("profile_pic",False)  
-               fs = FileSystemStorage()        
-               filename = fs.save(profile_pic.name,profile_pic)
-               profile_pic_url = fs.url(filename)
-           
-            else:
-               profile_pic_url = None  
+    if request.method == "POST":
+        try:
+            # Extract form data
+            segment = request.POST.get('school_segment')
+            full_name = request.POST.get('full_name')
+            address = request.POST.get('address')
+            street_address = request.POST.get('street_address')
+            house_number = request.POST.get('house_number')
+            health_status = request.POST.get('health_status')
+            physical_disability = request.POST.get('physical_disability')
+            student_photo = request.FILES.get('student_photo')
+            birth_certificate_id = request.POST.get('birth_certificate_id')
+            birth_certificate_photo = request.FILES.get('birth_certificate_photo')
+            allergies = request.POST.get('allergies')
+            current_year = request.POST.get('current_year')
+            is_finished = request.POST.get('is_finished')
+            current_class = request.POST.get('current_class')
+            gender = request.POST.get('student_gender')
+            
+            father_name = request.POST.get('father_name')
+            father_phone_number = request.POST.get('father_phone_number')
+            father_address = request.POST.get('father_address')
+            father_street_address = request.POST.get('father_street_address')
+            father_house_number = request.POST.get('father_house_number')
+            father_national_id = request.POST.get('father_national_id')
+            father_status = request.POST.get('father_status')
+            father_profession = request.POST.get('father_occupation')
+            
+            mother_name = request.POST.get('mother_name')
+            mother_phone_number = request.POST.get('mother_phone_number')
+            mother_address = request.POST.get('mother_address')
+            mother_street_address = request.POST.get('mother_street_address')
+            mother_house_number = request.POST.get('mother_house_number')
+            mother_national_id = request.POST.get('mother_national_id')
+            mother_status = request.POST.get('mother_status')
+            mother_profession = request.POST.get('mother_occupation')
+            
+            guardian_name = request.POST.get('guardian_name')
+            guardian_phone_number = request.POST.get('guardian_phone_number')
+            guardian_address = request.POST.get('guardian_address')
+            guardian_street_address = request.POST.get('guardian_street_address')
+            guardian_house_number = request.POST.get('guardian_house_number')
+            guardian_national_id = request.POST.get('guardian_national_id')
+            guardian_gender = request.POST.get('guardian_gender')
+            guardian_status = request.POST.get('guardian_status')
+            guardian_profession = request.POST.get('guardian_occupation')
+            
+            sponsor_name = request.POST.get('sponsor_name')
+            sponsor_phone_number = request.POST.get('sponsor_phone_number')
+            sponsor_street_address = request.POST.get('sponsor_street_address')
+            sponsor_address = request.POST.get('sponsor_address')
+            sponsor_house_number = request.POST.get('sponsor_house_number')
+            sponsor_national_id = request.POST.get('sponsor_national_id')
+            sponsor_status = request.POST.get('sponsor_status')
+            sponsor_profession = request.POST.get('sponsor_profession')
+            
+
+            # Save the form data to the database
             try:
-                user= CustomUser.objects.create_user(username=username,password=password,email=email,first_name=first_name,last_name=last_name,user_type=3)
-                user.students.address = address
-                session_id = SessionYearModel.objects.get(id=session_year_id)
-                user.students.session_id = session_id  
-                course_obj = Courses.objects.get(id=course_id)             
-                user.students.course_id = course_obj                              
-                user.students.gender = sex
-                user.students.profile_pic =profile_pic_url             
+                # Save the student's profile picture
+                student_photo_url = None
+                if student_photo:
+                    fs = FileSystemStorage()
+                    filename = fs.save(student_photo.name, student_photo)
+                    student_photo_url = fs.url(filename)
+
+                # Save the birth certificate photo
+                birth_certificate_photo_url = None
+                if birth_certificate_photo:
+                    fs = FileSystemStorage()
+                    filename = fs.save(birth_certificate_photo.name, birth_certificate_photo)
+                    birth_certificate_photo_url = fs.url(filename)
+
+                # Save the student record
+                username = full_name.replace(" ", "")  # Remove spaces from full_name to create a username
+                first_name, *last_name_parts = full_name.split(" ")  # Split full_name into first_name and last_name parts
+
+# Join the remaining last_name_parts if any
+                last_name = " ".join(last_name_parts) if last_name_parts else None
+# Create the user with the updated values
+                user = CustomUser.objects.create_user(username=username, password=None, email=None, first_name=first_name, last_name=last_name, user_type=3)
+
+# Create a new instance of the Students model
+                student = Students()
+                student.full_name = full_name
+                student.address = address
+                student.street_address = street_address
+                student.house_number = house_number
+                student.health_status = health_status
+                student.physical_disability = physical_disability
+                student.profile_pic = student_photo_url
+                student.gender = gender
+                student.birth_certificate_id = birth_certificate_id
+                student.birth_certificate_photo = birth_certificate_photo_url
+                student.allergies = allergies
+                student.current_year = current_year
+                student.school_segment = segment
+                student.current_class = current_class
+                student.is_finished = is_finished
+
+                student.father_name = father_name
+                student.father_phone_number = father_phone_number
+                student.father_address = father_address
+                student.father_street_address = father_street_address
+                student.father_house_number = father_house_number
+                student.father_national_id = father_national_id
+                student.father_status = father_status
+                student.father_profession = father_profession
+
+                student.mother_name = mother_name
+                student.mother_phone_number = mother_phone_number
+                student.mother_address = mother_address
+                student.mother_street_address = mother_street_address
+                student.mother_house_number = mother_house_number
+                student.mother_national_id = mother_national_id
+                student.mother_status = mother_status
+                student.mother_profession = mother_profession
+
+                student.guardian_name = guardian_name
+                student.guardian_phone_number = guardian_phone_number
+                student.guardian_street_address = guardian_street_address
+                student.guardian_address = guardian_address
+                student.guardian_house_number = guardian_house_number
+                student.guardian_national_id = guardian_national_id
+                student.guardian_status = guardian_status
+                student.guardian_gender = guardian_gender
+                student.guardian_profession = guardian_profession
+
+                student.sponsor_name = sponsor_name
+                student.sponsor_phone_number = sponsor_phone_number
+                student.sponsor_address = sponsor_address
+                student.sponsor_street_address = sponsor_street_address
+                student.sponsor_house_number = sponsor_house_number
+                student.sponsor_national_id = sponsor_national_id
+                student.sponsor_status = sponsor_status
+                student.sponsor_profession = sponsor_profession
+
+# Assign the student instance to the user's 'students' attribute
+                user.students = student                      
+               
+                student.save()
                 user.save()
-                messages.success(request,"Successfully added students")
-                return HttpResponseRedirect(reverse("add_student"))  
-             
-            except:
-               messages.error(request,"failed to add students")
-               return HttpResponseRedirect(reverse("add_student")) 
-           
-        else:
-            forms = AddStudentForm(request.POST)   
-            return render(request,"hod_template/add_student.html",{"forms":forms}) 
+                 
+                messages.success(request, "Successfully added student")
+                return redirect("add_student")
+            except Exception as e:
+                messages.error(request, f"Error saving student record: {str(e)}")
+        except Exception as e:
+            messages.error(request, f"Error: {str(e)}")
+
+    return redirect("add_student")
         
 
-def add_student(request):    
-    forms  = AddStudentForm()
-    return render(request,"hod_template/add_student.html",{"forms":forms})  
+def add_student(request):
+    form = AddStudentForm()
+    if request.method == 'POST':
+        # Process form submission
+        pass
+
+    context = {
+        'form': form
+    }
+    return render(request, 'hod_template/add_student.html', context)
 
 def single_student_detail(request,student_id):
     return render(request,"hod_template/student_details.html")  
@@ -235,9 +363,7 @@ def student_list(request):
     
     return render(request, "paginator.html", {"students": students, "page_obj": page_obj})  
   
-def manage_course(request):  
-    courses=Courses.objects.all()      
-    return render(request,"hod_template/manage_course.html",{"courses":courses})   
+
   
 def manage_staff(request):       
     per_page = request.GET.get('per_page', 3)  # Get the number of items to display per page from the request
@@ -324,7 +450,7 @@ def edit_student_save(request):
         address = cleaned_data["address"]
         username = cleaned_data["username"]
         sex = cleaned_data["sex"]
-        course_id = cleaned_data["course_name"]
+       
         session_year = cleaned_data["session_year_id"]
         
 
@@ -348,8 +474,7 @@ def edit_student_save(request):
             student.gender = sex
             session_d = SessionYearModel.objects.get(id = session_year)
             student.session_id = session_d
-            course = Courses.objects.get(id=course_id)
-            student.course_id = course
+       
             if profile_pic_url:
                 student.profile_pic = profile_pic_url
             student.save()
@@ -375,45 +500,14 @@ def edit_student(request,student_id):
     forms.fields['last_name'].initial  = students.admin.last_name
     forms.fields['username'].initial  = students.admin.username
     forms.fields['address'].initial  = students.address
-    forms.fields['course_name'].initial  = students.course_id.id
+  
     forms.fields['sex'].initial  = students.gender
     forms.fields['session_year_id'].initial  = students.session_id  
     forms.fields['profile_pic'].initial  = students.profile_pic
     return render(request,"hod_template/edit_student.html",{"forms":forms,"id":student_id,"username":students.admin.username})     
 
     
-def edit_course(request,course_id):  
-    request.session['course_id'] = course_id
-    courses = Courses.objects.get(id = course_id)
-    forms = AddCourseForm() 
-    forms.fields['course'].initial = courses.Course_name
-    return render(request,"hod_template/edit_course.html",{"forms":forms,"id":course_id})  
-
-def edit_course_save(request):  
-    if request.method!= "POST":
-        return HttpResponse("Method not allowed")
-    
-    course_id = request.session.get("course_id")
-    if course_id is None:
-        return HttpResponseRedirect(reverse("manage_course"))
-    
-    forms = AddCourseForm(request.POST)
-    if forms.is_valid():
-        course_name = forms.cleaned_data["course"]       
-        try:
-            course_modal = Courses.objects.get(id=course_id)
-            course_modal.Course_name = course_name
-            course_modal.save()
-            
-            messages.success(request,"course is successfully added")
-            return HttpResponseRedirect(reverse("edit_course",args=[course_id]))
-        except:
-            messages.error(request,"course failed to be edited")
-            return HttpResponseRedirect(reverse("edit_course",args=[course_id]))
-                
-            
-    subjects=Subject.objects.all()  
-    return render(request,"hod_template/manage_subject.html",{"subjects":subjects})       
+      
 
 
 def edit_subject(request,subject_id):  
@@ -421,7 +515,7 @@ def edit_subject(request,subject_id):
     subjects = Subject.objects.get(id = subject_id)
     forms = AddSubjectForm() 
     forms.fields['subject_name'].initial =subjects.subject_name
-    forms.fields['course_name'].initial = subjects.course_id.id
+    
     forms.fields['staff_name'].initial = subjects.staff_id.id
     return render(request,"hod_template/edit_subject.html",{"forms":forms,"id":subject_id}) 
 
@@ -437,7 +531,7 @@ def edit_subject_save(request):
     forms = AddSubjectForm(request.POST)
     if forms.is_valid():
         subject_name = forms.cleaned_data["subject_name"]
-        course_id= forms.cleaned_data["course_name"]
+        
         staff_id = forms.cleaned_data["staff_name"]
         
 
@@ -448,8 +542,7 @@ def edit_subject_save(request):
             staff_modal = CustomUser.objects.get(id=staff_id)
             subject_modal.staff_id = staff_modal
 
-            course_modal = Courses.objects.get(id=course_id)
-            subject_modal.course_id = course_modal
+      
 
             subject_modal.save()
             messages.success(request, "Subject successfully edited")
@@ -463,9 +556,7 @@ def edit_subject_save(request):
             messages.error(request, "Failed to edit subject. Staff does not exist.")
             return HttpResponseRedirect(reverse("edit_subject", args=[subject_id]))
 
-        except Courses.DoesNotExist:
-            messages.error(request, "Failed to edit subject. Course does not exist.")
-            return HttpResponseRedirect(reverse("edit_subject", args=[subject_id])) 
+
     subjects=Subject.objects.all()  
     return render(request,"hod_template/manage_subject.html",{"subjects":subjects})     
 

@@ -87,7 +87,10 @@ DATABASES = {
         'USER':'student_management_system',
         'PASSWORD':'m2r3i4s8',            
         'HOST':'localhost',
-        'PORT':'3306'
+        'PORT':'3306',
+        'OPTIONS': {
+            'init_command': "SET sql_mode='STRICT_TRANS_TABLES'",
+        },
     }
 }
 
