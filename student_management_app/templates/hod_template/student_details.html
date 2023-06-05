@@ -10,23 +10,38 @@
             <div class="card-body">
                 <tbody>
                     <tr>
-                        <td><b>Name</b>: {{ single_student.name }}</td>
+                        <td><b>Name</b>: {{students.admin.first_name}} {{students.admin.last_name}}</td>
                         <br>
-                        <td><b>Birth certificate ID</b>: {{ single_student.name }}</td>
+                        <td><b>surname</b>: {{students.surname}}</td>
                         <br>
-                        <td><b>Gender:</b> {{ single_student.gender }}</td>
+                        <td><b>Registration date </b>: {{students.admin.date_joined}}</td>
                         <br>
-                        <td><b>Shehia:</b> {{ single_student.gender }}</td>
+                        <td><b>Birth certificate ID</b>: {{ students.birth_certificate_id }}</td>
                         <br>
-                        <td><b>street address:</b> {{ single_student.gender }}</td>
+                        <td><b>Gender:</b> {{ students.gender }}</td>
                         <br>
-                        <td><b>house number:</b> {{ single_student.gender }}</td>
+                        <td><b>Shehia:</b> {{ students.address }}</td>
                         <br>
-                        <td><b>Age:</b> {{ single_student.age }}</td>
+                        <td><b>street address:</b> {{ students.street_address }}</td>
                         <br>
-                        <td><b>Physical disability:</b> {{ single_student.gender }}</td>
+                        <td><b>house number:</b> {{ students.house_number }}</td>
                         <br>
-                        <td><b>Health status:</b> {{ single_student.age }}</td>
+                        <td><b>Date of birth:</b> {{ students.date_of_birth }}</td>
+                        <br>
+                        <td><b>Physical disability:</b> {{ students.physical_disability }}</td>
+                        <br>
+                        <td><b>Health status:</b> {{ students.health_status }}</td>
+                        <br>
+                        <td><b>Alergies :</b> {{ students.allergies }}</td>
+                        <br>
+                        <td><b>finished school:</b> {{ students.is_finished }}</td>
+                        <br>
+                        <td><b>Current level of study :</b> {{ students.school_segment }}</td>
+                        <br>
+                        <td><b>current class :</b> {{ students.current_class }}</td>
+                        <br>
+                        <br>
+                        <td><b>current year :</b> {{ students.current_year }}</td>
                         <br>
                     </tr>
                 </tbody>
@@ -241,9 +256,11 @@
             <div class="card-header">
                  <i class="fa fa-align-justify"></i> Student Image
             </div>
-            <div class="card-body">
-                <img src="{{ single_teacher.teacher_img.url }}" class="img-fluid" />
-            </div>
+            {% if students.profile_pic %}
+            <img src="{{students.profile_pic}}" style="width:100px" />
+        {% else %}
+            <p>No profile picture available</p>
+        {% endif %}
         </div>
     </div>
 

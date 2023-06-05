@@ -1,16 +1,23 @@
 import json
 from django.urls import reverse
+from datetime import datetime
 from django.contrib import messages
+from django.core.files.storage import FileSystemStorage
 from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
 from django.shortcuts import render
 from django.core.files.storage import FileSystemStorage
 from student_management_app.forms import  AddSessionYearForm, AddStaffForm, AddStudentForm, AddSubjectForm, EditStaffForm, EditStudentForm
-from student_management_app.models import Attendance, AttendanceReport, CustomUser, FeedBackStaff, FeedBackStudent, LeaveReportStaffs, LeaveReportStudent, SessionYearModel, Staffs, Students, Subject
+from student_management_app.models import Attendance, AttendanceReport, CustomUser, FeedBackStaff, FeedBackStudent, LeaveReportStaffs, LeaveReportStudent, SessionYearModel, Staffs, Students, Subject,Parent
 from django.core.exceptions import ObjectDoesNotExist
 from django.views.decorators.csrf import csrf_exempt
 from django.core.paginator import Paginator
-from django.core.exceptions import ValidationError
+from django.contrib.auth.hashers import make_password
+from django.shortcuts import render, get_object_or_404
 from django.shortcuts import render, redirect
+from django.db import IntegrityError, DatabaseError
+
+
+
 
 
 def admin_home(request):
@@ -171,70 +178,184 @@ def add_subject_save(request):
 def add_subject(request):
     forms = AddSubjectForm()
     return render(request,"hod_template/add_subject.html",{"forms":forms})    
-               
+
+def add_parents(request):
+    students = Students.objects.all()
+    return render(request, "hod_template/parent_form.html", {'students': students})   
+
+
+
+def edit_parents(request,parent_id):
+    request.session['parent_id'] = parent_id       
+    parents=Parent.objects.get(id=parent_id) 
+    students = Students.objects.all()
+    return render(request,"hod_template/edit_parent.html",{"id":parent_id,"username":parents.name,"parents":parents,"students":students})  
+
+def update_parent(request):
+    parent_id = request.session.get("parent_id")
+    if parent_id is None:
+        return HttpResponseRedirect(reverse("edit_parents", kwargs={"parent_id": parent_id}))
+
+    try:
+        parent = get_object_or_404(Parent, id=parent_id)
+
+        if request.method == 'POST':
+            # Retrieve form field values from the request
+            name = request.POST.get('name')
+            phone = request.POST.get('phone')
+            occupation = request.POST.get('occupation')
+            address = request.POST.get('sheia')
+            street_address = request.POST.get('street')
+            house_number = request.POST.get('house')
+            national_id = request.POST.get('nationalid')
+            status = request.POST.get('status')
+            gender = request.POST.get('gender')
+            parent_type = request.POST.get('type')
+
+            # Perform form field validation
+            if not name:
+                messages.error(request, "Name field is required.")
+            elif not phone:
+                messages.error(request, "Phone Number field is required.")
+            elif not occupation:
+                messages.error(request, "Occupation field is required.")
+            elif not address:
+                messages.error(request, "Sheia Address field is required.")
+            elif not street_address:
+                messages.error(request, "Street Address field is required.")
+            elif not house_number:
+                messages.error(request, "House Number field is required.")
+            elif not national_id:
+                messages.error(request, "National ID field is required.")
+            elif not status:
+                messages.error(request, "Status field is required.")
+            elif not gender:
+                messages.error(request, "Gender field is required.")
+            elif not parent_type:
+                messages.error(request, "Relation field is required.")
+            else:
+                # Update the parent record
+                parent.name = name
+                parent.phone = phone
+                parent.occupation = occupation
+                parent.address = address
+                parent.street_address = street_address
+                parent.house_number = house_number
+                parent.national_id = national_id
+                parent.status = status
+                parent.gender = gender
+                parent.parent_type = parent_type
+
+                try:
+                    parent.save()
+                    messages.success(request, "Parent has been successfully updated.")
+                    return HttpResponseRedirect(reverse("edit_parents", kwargs={"parent_id": parent_id}))
+                except IntegrityError as e:
+                    error_code = e.args[0]
+                    if error_code == 1062:  # Duplicate entry error
+                        messages.error(request, "Duplicate entry error. The parent already exists.")
+                    else:
+                        messages.error(request, "Failed to update parent due to a database error.")
+                except DatabaseError:
+                    messages.error(request, "Failed to update parent due to a database error.")
+
+        context = {
+            'parent': parent,
+        }
+        return render(request, 'hod_template/edit_parent.html', context)
+
+    except Parent.DoesNotExist:
+        messages.error(request, "Parent not found.")
+        return HttpResponseRedirect(reverse("edit_parents", kwargs={"parent_id": parent_id}))
+    
+    
+def save_parent(request):
+    if request.method == "POST":
+        student_id = request.POST.get('student_id')
+        name = request.POST.get('name')
+        phone = request.POST.get('phone')
+        occupation = request.POST.get('occupation')
+        sheia = request.POST.get('sheia')
+        street = request.POST.get('street')
+        house = request.POST.get('house')
+        national_id = request.POST.get('nationalid')
+        status = request.POST.get('status')
+        gender = request.POST.get('gender')
+        parent_type = request.POST.get('type')
+
+        # Perform validation
+        if not student_id or not name or not phone:
+            messages.error(request, "Please provide all required fields")
+            return redirect("add_parents")
+
+        try:
+            # Get the student instance based on the student_id
+            student = Students.objects.get(id=student_id)
+
+            # Create a new instance of the Parents model
+            parent = Parent()
+            parent.student = student
+            parent.name = name
+            parent.phone = phone
+            parent.occupation = occupation
+            parent.address = sheia
+            parent.street_address = street
+            parent.house_number = house
+            parent.national_id = national_id
+            parent.status = status
+            parent.gender = gender
+            parent.parent_type = parent_type
+
+            # Save the parent record
+            parent.save()
+
+            # Handle success
+            messages.success(request, "Parent information saved successfully")
+            return redirect("add_parents")
+        except Exception as e:
+            # Handle error
+            messages.error(request, "Error saving parent information: " + str(e))
+            return redirect("add_parents")
+    else:
+        # Handle GET request
+        return redirect("add_parents")          
  
 def add_student_save(request):
     if request.method == "POST":
         try:
             # Extract form data
-            segment = request.POST.get('school_segment')
-            full_name = request.POST.get('full_name')
-            address = request.POST.get('address')
+            first_name = request.POST.get('first_name')
+            surname = request.POST.get('surname')
+            last_name = request.POST.get('last_name')
+            date_of_birth_str = request.POST.get('date_of_birth')
+            date_of_birth = datetime.strptime(date_of_birth_str, '%Y-%m-%d').date()
+            print(date_of_birth)
+            gender = request.POST.get('gender')
+            
+            phone_number = request.POST.get('phone_number')
+            school_segment = request.POST.get('school_segment')
+            current_class = request.POST.get('current_class')
+            birth_certificate_id = request.POST.get('birth_certificate_id')
+            allergies = request.POST.get('allergies')
+            current_year = request.POST.get('current_year')
+            print(current_year)
+            is_finished = request.POST.get('is_finished')
+            sheia_address = request.POST.get('sheia_address')
             street_address = request.POST.get('street_address')
             house_number = request.POST.get('house_number')
             health_status = request.POST.get('health_status')
             physical_disability = request.POST.get('physical_disability')
-            student_photo = request.FILES.get('student_photo')
-            birth_certificate_id = request.POST.get('birth_certificate_id')
-            birth_certificate_photo = request.FILES.get('birth_certificate_photo')
-            allergies = request.POST.get('allergies')
-            current_year = request.POST.get('current_year')
-            is_finished = request.POST.get('is_finished')
-            current_class = request.POST.get('current_class')
-            gender = request.POST.get('student_gender')
-            
-            father_name = request.POST.get('father_name')
-            father_phone_number = request.POST.get('father_phone_number')
-            father_address = request.POST.get('father_address')
-            father_street_address = request.POST.get('father_street_address')
-            father_house_number = request.POST.get('father_house_number')
-            father_national_id = request.POST.get('father_national_id')
-            father_status = request.POST.get('father_status')
-            father_profession = request.POST.get('father_occupation')
-            
-            mother_name = request.POST.get('mother_name')
-            mother_phone_number = request.POST.get('mother_phone_number')
-            mother_address = request.POST.get('mother_address')
-            mother_street_address = request.POST.get('mother_street_address')
-            mother_house_number = request.POST.get('mother_house_number')
-            mother_national_id = request.POST.get('mother_national_id')
-            mother_status = request.POST.get('mother_status')
-            mother_profession = request.POST.get('mother_occupation')
-            
-            guardian_name = request.POST.get('guardian_name')
-            guardian_phone_number = request.POST.get('guardian_phone_number')
-            guardian_address = request.POST.get('guardian_address')
-            guardian_street_address = request.POST.get('guardian_street_address')
-            guardian_house_number = request.POST.get('guardian_house_number')
-            guardian_national_id = request.POST.get('guardian_national_id')
-            guardian_gender = request.POST.get('guardian_gender')
-            guardian_status = request.POST.get('guardian_status')
-            guardian_profession = request.POST.get('guardian_occupation')
-            
-            sponsor_name = request.POST.get('sponsor_name')
-            sponsor_phone_number = request.POST.get('sponsor_phone_number')
-            sponsor_street_address = request.POST.get('sponsor_street_address')
-            sponsor_address = request.POST.get('sponsor_address')
-            sponsor_house_number = request.POST.get('sponsor_house_number')
-            sponsor_national_id = request.POST.get('sponsor_national_id')
-            sponsor_status = request.POST.get('sponsor_status')
-            sponsor_profession = request.POST.get('sponsor_profession')
-            
+
+            # Perform validation
+            if not first_name or not last_name or not date_of_birth:
+                messages.error(request, "Please provide all required fields")
+                return redirect("add_student")
 
             # Save the form data to the database
             try:
                 # Save the student's profile picture
                 student_photo_url = None
+                student_photo = request.FILES.get('student_photo')
                 if student_photo:
                     fs = FileSystemStorage()
                     filename = fs.save(student_photo.name, student_photo)
@@ -242,81 +363,43 @@ def add_student_save(request):
 
                 # Save the birth certificate photo
                 birth_certificate_photo_url = None
+                birth_certificate_photo = request.FILES.get('birth_certificate_photo')
                 if birth_certificate_photo:
                     fs = FileSystemStorage()
                     filename = fs.save(birth_certificate_photo.name, birth_certificate_photo)
                     birth_certificate_photo_url = fs.url(filename)
 
+                # Retrieve or create the CustomUser instance based on the username
+                username = first_name.lower() + last_name.lower()
+                default_email = first_name.lower() + "@gmail.com"
+                password = 'default_password'  # Set a default password
+                hashed_password = make_password(password)
+                user= CustomUser.objects.create_user(username=username,password=hashed_password,email=default_email,first_name=first_name,last_name=last_name,user_type=3)
+                # Create a new instance of the Student model             
+                user.students.first_name = first_name
+                user.students.surname = surname
+                user.students.last_name = last_name
+                user.students.date_of_birth = date_of_birth
+                user.students.gender = gender
+                
+                user.students.phone_number = phone_number
+                user.students.school_segment = school_segment
+                user.students.current_class = current_class
+                user.students.birth_certificate_id = birth_certificate_id
+                user.students.allergies = allergies
+                user.students.current_year = current_year
+                user.students.is_finished = is_finished
+                user.students.address = sheia_address
+                user.students.street_address = street_address
+                user.students.house_number = house_number
+                user.students.health_status = health_status
+                user.students.physical_disability = physical_disability
+                user.students.profile_pic = student_photo_url
+                user.students.birth_certificate_photo = birth_certificate_photo_url
+
                 # Save the student record
-                username = full_name.replace(" ", "")  # Remove spaces from full_name to create a username
-                first_name, *last_name_parts = full_name.split(" ")  # Split full_name into first_name and last_name parts
-
-# Join the remaining last_name_parts if any
-                last_name = " ".join(last_name_parts) if last_name_parts else None
-# Create the user with the updated values
-                user = CustomUser.objects.create_user(username=username, password=None, email=None, first_name=first_name, last_name=last_name, user_type=3)
-
-# Create a new instance of the Students model
-                student = Students()
-                student.full_name = full_name
-                student.address = address
-                student.street_address = street_address
-                student.house_number = house_number
-                student.health_status = health_status
-                student.physical_disability = physical_disability
-                student.profile_pic = student_photo_url
-                student.gender = gender
-                student.birth_certificate_id = birth_certificate_id
-                student.birth_certificate_photo = birth_certificate_photo_url
-                student.allergies = allergies
-                student.current_year = current_year
-                student.school_segment = segment
-                student.current_class = current_class
-                student.is_finished = is_finished
-
-                student.father_name = father_name
-                student.father_phone_number = father_phone_number
-                student.father_address = father_address
-                student.father_street_address = father_street_address
-                student.father_house_number = father_house_number
-                student.father_national_id = father_national_id
-                student.father_status = father_status
-                student.father_profession = father_profession
-
-                student.mother_name = mother_name
-                student.mother_phone_number = mother_phone_number
-                student.mother_address = mother_address
-                student.mother_street_address = mother_street_address
-                student.mother_house_number = mother_house_number
-                student.mother_national_id = mother_national_id
-                student.mother_status = mother_status
-                student.mother_profession = mother_profession
-
-                student.guardian_name = guardian_name
-                student.guardian_phone_number = guardian_phone_number
-                student.guardian_street_address = guardian_street_address
-                student.guardian_address = guardian_address
-                student.guardian_house_number = guardian_house_number
-                student.guardian_national_id = guardian_national_id
-                student.guardian_status = guardian_status
-                student.guardian_gender = guardian_gender
-                student.guardian_profession = guardian_profession
-
-                student.sponsor_name = sponsor_name
-                student.sponsor_phone_number = sponsor_phone_number
-                student.sponsor_address = sponsor_address
-                student.sponsor_street_address = sponsor_street_address
-                student.sponsor_house_number = sponsor_house_number
-                student.sponsor_national_id = sponsor_national_id
-                student.sponsor_status = sponsor_status
-                student.sponsor_profession = sponsor_profession
-
-# Assign the student instance to the user's 'students' attribute
-                user.students = student                      
-               
-                student.save()
                 user.save()
-                 
+
                 messages.success(request, "Successfully added student")
                 return redirect("add_student")
             except Exception as e:
@@ -325,6 +408,8 @@ def add_student_save(request):
             messages.error(request, f"Error: {str(e)}")
 
     return redirect("add_student")
+
+
         
 
 def add_student(request):
@@ -338,8 +423,27 @@ def add_student(request):
     }
     return render(request, 'hod_template/add_student.html', context)
 
-def single_student_detail(request,student_id):
-    return render(request,"hod_template/student_details.html")  
+def single_student_detail(request, student_id):
+    students = get_object_or_404(Students, id=student_id)
+    parents = Parent.objects.filter(student=students)
+    
+    context = {
+        'students': students,
+        'parents': parents
+    }
+    
+    return render(request, "hod_template/student_details.html", context) 
+
+def single_parent_detail(request, parent_id):
+    parent = get_object_or_404(Parent, id=parent_id)
+    student = parent.student
+    
+    context = {
+        'parent': parent,
+        'student': student
+    }
+    
+    return render(request, "hod_template/parent_details.html", context) 
 
   
 def manage_student(request):
@@ -349,6 +453,14 @@ def manage_student(request):
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
     return render(request, "hod_template/manage_student.html", {"students": students, "page_obj": page_obj})
+
+def manage_parent(request):
+    per_page = request.GET.get('per_page', 3)  # Get the number of items to display per page from the request
+    parents = Parent.objects.all()
+    paginator = Paginator(parents, per_page)
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+    return render(request, "hod_template/manage_parent.html", {"students": parents, "page_obj": page_obj})
  
 def student_list(request):
     search_query = request.GET.get('search', '')
@@ -433,6 +545,8 @@ def edit_staff_save(request):
             messages.error(request, "Failed to edit staff. Staff does not exist.")
             return HttpResponseRedirect(reverse("edit_staff", args=[staff_id]))
         
+
+
 def edit_student_save(request):
     if request.method != "POST":
         return HttpResponse("Method not allowed")
@@ -441,70 +555,98 @@ def edit_student_save(request):
     if student_id is None:
         return HttpResponseRedirect(reverse("manage_student"))
 
-    form = EditStudentForm(request.POST, request.FILES)
-    if form.is_valid():
-        cleaned_data = form.cleaned_data
-        email = cleaned_data["email"]
-        first_name = cleaned_data["first_name"]
-        last_name = cleaned_data["last_name"]
-        address = cleaned_data["address"]
-        username = cleaned_data["username"]
-        sex = cleaned_data["sex"]
-       
-        session_year = cleaned_data["session_year_id"]
-        
+    try:
+        user = CustomUser.objects.get(id=student_id)
+        # Get the form data
+        first_name = request.POST.get('first_name')
+        surname = request.POST.get('surname')
+        last_name = request.POST.get('last_name')
+        date_of_birth_str = request.POST.get('date_of_birth')
+        date_of_birth = datetime.strptime(date_of_birth_str, '%Y-%m-%d').date()
+        gender = request.POST.get('gender')
+        phone_number = request.POST.get('phone_number')
+        school_segment = request.POST.get('school_segment')
+        current_class = request.POST.get('current_class')
+        birth_certificate_id = request.POST.get('birth_certificate_id')
+        allergies = request.POST.get('allergies')
+        current_year = request.POST.get('current_year')
+        is_finished = request.POST.get('is_finished')
+        sheia_address = request.POST.get('sheia_address')
+        street_address = request.POST.get('street_address')
+        house_number = request.POST.get('house_number')
+        health_status = request.POST.get('health_status')
+        physical_disability = request.POST.get('physical_disability')
 
-        profile_pic_url = None
-        profile_pic = request.FILES.get("profile_pic")
-        if profile_pic:
+        # Perform validation
+        if not first_name or not last_name or not date_of_birth:
+            messages.error(request, "Please provide all required fields")
+            return redirect("add_student")
+
+        # Update user information
+        user.first_name = first_name
+        user.last_name = last_name
+        user.save()
+
+        # Update student information
+        student = Students.objects.get(admin=user)
+        student.surname = surname
+        student.date_of_birth = date_of_birth
+        student.gender = gender
+        student.phone_number = phone_number
+        student.school_segment = school_segment
+        student.current_class = current_class
+        student.birth_certificate_id = birth_certificate_id
+        student.allergies = allergies
+        student.current_year = current_year
+        student.is_finished = is_finished
+        student.address = sheia_address
+        student.street_address = street_address
+        student.house_number = house_number
+        student.health_status = health_status
+        student.physical_disability = physical_disability
+
+        # Save the profile picture
+        student_photo = request.FILES.get('student_photo')
+        if student_photo:
             fs = FileSystemStorage()
-            filename = fs.save(profile_pic.name, profile_pic)
-            profile_pic_url = fs.url(filename)
+            filename = fs.save(student_photo.name, student_photo)
+            student.profile_pic = fs.url(filename)
 
-        try:
-            user = CustomUser.objects.get(id=student_id)
-            user.first_name = first_name
-            user.last_name = last_name
-            user.email = email
-            user.username = username
-            user.save()
+        # Save the birth certificate photo
+        birth_certificate_photo = request.FILES.get('birth_certificate_photo')
+        if birth_certificate_photo:
+            fs = FileSystemStorage()
+            filename = fs.save(birth_certificate_photo.name, birth_certificate_photo)
+            student.birth_certificate_pic = fs.url(filename)
 
-            student = Students.objects.get(admin_id=student_id)
-            student.address = address
-            student.gender = sex
-            session_d = SessionYearModel.objects.get(id = session_year)
-            student.session_id = session_d
-       
-            if profile_pic_url:
-                student.profile_pic = profile_pic_url
-            student.save()
+        student.save()
 
-            del request.session['student_id']
-            messages.success(request, "Successfully edited student")
-            return HttpResponseRedirect(reverse("edit_student", kwargs={"student_id": student_id}))
+        del request.session['student_id']
+        messages.success(request, "Successfully edited student")
+        return HttpResponseRedirect(reverse("edit_student", kwargs={"student_id": student_id}))
 
-        except (CustomUser.DoesNotExist, Students.DoesNotExist):
-            messages.error(request, "Failed to edit student")
-            return HttpResponseRedirect(reverse("edit_student", kwargs={"student_id": student_id}))
+    except CustomUser.DoesNotExist:
+        messages.error(request, "User does not exist")
+        return HttpResponseRedirect(reverse("manage_student"))
 
-    students = Students.objects.get(admin=student_id)
-    return render(request, "hod_template/edit_student.html", {"forms": form, "id": student_id, "username": students.admin.username})
+    except Students.DoesNotExist:
+        messages.error(request, "Student does not exist")
+        return HttpResponseRedirect(reverse("manage_student"))
+
+    except IntegrityError:
+        messages.error(request, "Failed to edit student due to a database error")
+        return HttpResponseRedirect(reverse("manage_student"))
+
+
+
+
 
    
 def edit_student(request,student_id):
     request.session['student_id'] = student_id       
-    students=Students.objects.get(admin=student_id)  
-    forms = EditStudentForm()
-    forms.fields['email'].initial  = students.admin.email    
-    forms.fields['first_name'].initial  = students.admin.first_name
-    forms.fields['last_name'].initial  = students.admin.last_name
-    forms.fields['username'].initial  = students.admin.username
-    forms.fields['address'].initial  = students.address
-  
-    forms.fields['sex'].initial  = students.gender
-    forms.fields['session_year_id'].initial  = students.session_id  
-    forms.fields['profile_pic'].initial  = students.profile_pic
-    return render(request,"hod_template/edit_student.html",{"forms":forms,"id":student_id,"username":students.admin.username})     
+    students=Students.objects.get(admin=student_id) 
+
+    return render(request,"hod_template/edit_student.html",{"id":student_id,"username":students.admin.username,"students":students})     
 
     
       

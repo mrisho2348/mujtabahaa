@@ -50,7 +50,7 @@
                 <a href="#" class="nav-link">
                   <i class="nav-icon fas fa-graduation-cap"></i>
                   <p>
-                    STUDENTS 
+                    Students
                     <i class="fas fa-angle-left right"></i>
                   </p>
                 </a>
@@ -157,6 +157,16 @@
                     </a>
                   </li>
                 </ul>
+              </li>
+              <li class="nav-item">
+                {% url 'add_parents' as add_parents %}
+                {% url 'manage_parent' as manage_parent %}
+                <a href="{% url 'manage_parent' %}" class="nav-link  {% if request.path == manage_parent %}active{% endif %} {% if request.path == add_parents %}active{% endif %}">
+                  <i class="nav-icon fas fa-user"></i>
+                  <p>
+                    Parents
+                  </p>
+                </a>
               </li>
   
               <li class="nav-header">Finance</li>

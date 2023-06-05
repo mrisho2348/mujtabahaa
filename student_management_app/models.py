@@ -1,4 +1,5 @@
 from django.db import models
+from django.utils.crypto import get_random_string
 from django.contrib.auth.models import AbstractUser
 from django.dispatch import receiver
 from django.db.models.signals import post_save
@@ -43,87 +44,74 @@ class Subject(models.Model):
     objects = models.Manager()
     
 
+
+
+
+
 class Students(models.Model):
     id = models.AutoField(primary_key=True)
-    admin = models.OneToOneField(CustomUser, on_delete=models.CASCADE)
-    full_name = models.CharField(max_length=100)
-    GENDER_CHOICES = (
-        ('M', 'Male'),
-        ('F', 'Female'),
-       
-    )
-    gender = models.CharField(max_length=1, choices=GENDER_CHOICES, default='M')
-    address = models.TextField()
-    street_address = models.CharField(max_length=100)
-    house_number = models.CharField(max_length=50)
-    health_status = models.CharField(max_length=100)
-    physical_disability = models.CharField(max_length=100)
-    profile_pic = models.ImageField(upload_to='student_photos')
-    birth_certificate_id = models.CharField(max_length=50, blank=True, null=True)
-    birth_certificate_photo = models.ImageField(upload_to='birth_certificate_photos', blank=True, null=True)
-    allergies = models.CharField(max_length=100, blank=True, null=True)
+    admin = models.OneToOneField(CustomUser,on_delete=models.CASCADE)  
+    surname = models.CharField(max_length=100)    
+    date_of_birth = models.DateField(blank=True, null=True)
+    gender = models.CharField(max_length=10)    
+    phone_number = models.CharField(max_length=20)
+    school_segment = models.CharField(max_length=100)
+    current_class = models.CharField(max_length=100)
+    birth_certificate_id = models.CharField(max_length=100)
+    allergies = models.TextField(blank=True, null=True)
     current_year = models.IntegerField(blank=True, null=True)
     is_finished = models.BooleanField(default=False)
-    school_segment_choices = (
-        ("Nursery", "Nursery Level"),
-        ("Primary", "Primary Level"),
-        ("Secondary", "Secondary Level"),
-    )
-    school_segment = models.CharField(max_length=50, choices=school_segment_choices)
-    current_class = models.CharField(max_length=50)
-
-    father_name = models.CharField(max_length=50)
-    father_phone_number = models.CharField(max_length=50)
-    father_address = models.TextField()
-    father_street_address = models.CharField(max_length=50)
-    father_house_number = models.CharField(max_length=50)
-    father_national_id = models.CharField(max_length=50)
-    father_status_choices = (
-        ("Deceased", "Deceased"),
-        ("Alive", "Alive"),
-    )
-    father_status = models.CharField(max_length=50, choices=father_status_choices)
-    father_profession = models.CharField(max_length=50)
-    
-    mother_name = models.CharField(max_length=50)
-    mother_phone_number = models.CharField(max_length=50)
-    mother_address = models.TextField()
-    mother_street_address = models.CharField(max_length=50)
-    mother_house_number = models.CharField(max_length=50)
-    mother_national_id = models.CharField(max_length=50)
-    mother_status = models.CharField(max_length=50)
-    mother_profession = models.CharField(max_length=50)
-    
-    guardian_name = models.CharField(max_length=50, blank=True, null=True)
-    GENDER_CHOICES = (
-        ('M', 'Male'),
-        ('F', 'Female')
-        
-    )
-    guardian_gender = models.CharField(max_length=1, choices=GENDER_CHOICES, default='M')    
-    guardian_phone_number = models.CharField(max_length=50, blank=True, null=True)
-    guardian_address = models.TextField()
-    guardian_street_address = models.CharField(max_length=50, blank=True, null=True)
-    guardian_house_number = models.CharField(max_length=50, blank=True, null=True)
-    guardian_national_id = models.CharField(max_length=50, blank=True, null=True)
-    guardian_status = models.CharField(max_length=50, blank=True, null=True)
-    guardian_profession = models.CharField(max_length=50, blank=True, null=True)
-    
-    sponsor_name = models.CharField(max_length=50, blank=True, null=True)
-    sponsor_phone_number = models.CharField(max_length=50, blank=True, null=True)
-    sponsor_address = models.TextField()
-    sponsor_street_address = models.CharField(max_length=50, blank=True, null=True)
-    sponsor_house_number = models.CharField(max_length=50, blank=True, null=True)
-    sponsor_national_id = models.CharField(max_length=50, blank=True, null=True)
-    sponsor_status = models.CharField(max_length=50, blank=True, null=True)
-    sponsor_profession = models.CharField(max_length=50, blank=True, null=True) 
-    # Other fields...    
-         
+    address = models.CharField(max_length=200)
+    street_address = models.CharField(max_length=200)
+    house_number = models.CharField(max_length=20)
+    health_status = models.CharField(max_length=200)
+    physical_disability = models.CharField(max_length=200)
+    profile_pic = models.FileField(null=True, blank=True)
+    birth_certificate_photo = models.FileField(null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
-    fcm_token = models.TextField(default="")
+    updated_at = models.DateTimeField(auto_now_add=True) 
     objects = models.Manager()
-        
+
+
+
+    def __str__(self):
+        return self.first_name + " " + self.last_name
+    
+    
+    
+class Parent(models.Model):
+    GENDER_CHOICES = [
+        ('male', 'Male'),
+        ('female', 'Female'),
+    ]
+    
+    TYPE_CHOICES = [
+        ('parent', 'Parent'),
+        ('guardian', 'Guardian'),
+        ('sponsor', 'Sponsor'),
+    ]
+    
+    name = models.CharField(max_length=100)
+    phone = models.CharField(max_length=20)
+    occupation = models.CharField(max_length=100)
+    address = models.CharField(max_length=100)
+    street_address = models.CharField(max_length=100)
+    house_number = models.CharField(max_length=10)
+    national_id = models.CharField(max_length=20)
+    status = models.CharField(max_length=100)
+    gender = models.CharField(max_length=10, choices=GENDER_CHOICES)
+    parent_type = models.CharField(max_length=20, choices=TYPE_CHOICES)
+    student = models.OneToOneField(Students, on_delete=models.CASCADE, related_name='parent')
+    fcm_token = models.TextField(default="")
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now_add=True)       
+    objects = models.Manager()    
+    def __str__(self):
+        return self.name   
+    
+    
+    
+         
 class Attendance(models.Model):
     id = models.AutoField(primary_key=True)  
     subject_id = models.ForeignKey(Subject,on_delete=models.DO_NOTHING)

@@ -1,0 +1,55 @@
+{% extends 'hod_template/base_template.html' %}
+
+{% load static %}
+
+ {% block main_content %}
+
+<div class="row">
+    <div class="col-lg-12">
+        <div class="card">
+            <div class="card-header">
+                <i class="fa fa-align-justify"></i> Parent Personal Info
+            </div>
+            <div class="card-body">
+                <tbody>
+                    <tr>
+                        <td><b>Name</b>: {{parent.name}} </td>                        
+                        <br>
+                        <td><b>student name</b>: {{parent.student.admin.first_name}} {{parent.student.admin.last_name}}</td>
+                        <br>
+                        <td><b>phone number</b>: {{parent.phone}}</td>
+                        <br>
+                        <td><b>Registration date </b>: {{parent.created_at}}</td>
+                        <br>
+                        <td><b>Occupation </b>: {{ parent.occupation }}</td>
+                        <br>
+                        <td><b>Gender:</b> {{ parent.gender }}</td>
+                        <br>
+                        <td><b>Shehia:</b> {{ parent.address }}</td>
+                        <br>
+                        <td><b>street address:</b> {{ parent.street_address }}</td>
+                        <br>
+                        <td><b>house number:</b> {{ parent.house_number }}</td>
+                        <br>
+                        <td><b>National Id :</b> {{ parent.national_id }}</td>
+                        <br>
+                        <td><b>Status:</b> {{ parent.status }}</td>
+                        <br>
+                        <td><b>Type :</b> {{ parent.parent_type }}</td>
+                        <br>
+                     
+                       
+                    </tr>
+                </tbody>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+
+
+
+
+
+{% endblock main_content %}

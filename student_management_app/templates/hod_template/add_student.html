@@ -5,14 +5,11 @@
 {% endblock page_title %}
 
 {% block main_content %}
-    {% load static %}
-    <section class="content">
-        <div class="container-fluid">
-            <div class="content-wrappe">
-                <!-- Content Header (Page header) -->
+    {% load static %}             
+             
         
                 <!-- Main content -->
-                <section class="content">
+              
                     <div class="container-fluid">
                         <div class="row">
                             <!-- left column -->
@@ -22,439 +19,261 @@
                                     <div class="card-header">
                                         <h3 class="card-title">Add Students</h3>
                                     </div>
-                                    <div class="container-fluid">
-                                        <div class="row">
-                                            <div class="col-md-6">
-                                                <h2>Add Student</h2>
-                                                <form method="post" action="{% url 'add_student_save' %}"  enctype="multipart/form-data">
-                                                    {% csrf_token %}
-                                                    
-                                                    <!-- Student Information -->
-                                                    <div class="row">
-                                                        <div class="col-md-4">
-                                                            <div class="form-group">
-                                                                <label for="full_name">Full Name</label>
-                                                                <input type="text" class="form-control" id="full_name" name="full_name" maxlength="100" required>
+                                    
+                                    <form method="POST" enctype="multipart/form-data" action="{% url 'add_student_save' %}">
+                                        {% csrf_token %}
+                                        <div class="card-body">
+                                          
+                                                <div class="form-row">
+                                                    <div class="col-md-12">                                                      
+                                                        
+                                                            <div class="form-row">
+                                                                <div class="col-md-6">
+                                                                    <h4>Student Information</h4>
+                                                                </div>
                                                             </div>
-                                                        </div>
-                                                        <div class="col-md-4">
-                                                            <div class="form-group">
-                                                                <label for="student_age">Student's Age</label>
-                                                                <input type="number" class="form-control" id="student_age" name="student_age" required>
+                                                            <div class="form-row">
+                                                                <div class="col-md-6">
+                                                                    <div class="form-group">
+                                                                        <label for="first_name">First Name</label>
+                                                                        <input type="text" class="form-control" id="first_name" name="first_name" required>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="col-md-6">
+                                                                    <div class="form-group">
+                                                                        <label for="last_name">Last Name</label>
+                                                                        <input type="text" class="form-control" id="last_name" name="last_name" required>
+                                                                    </div>
+                                                                </div>
                                                             </div>
-                                                        </div>
-                                                        <div class="col-md-4">
-                                                            <div class="form-group">
-                                                                <label for="student_gender">Student's Gender</label>
-                                                                <select class="form-control" id="student_gender" name="student_gender" required>
-                                                                    <option value="M">Male</option>
-                                                                    <option value="F">Female</option>
-                                                                </select>
+                                                            
+                                                            <div class="form-row">
+                                                                <div class="col-md-6">
+                                                                    <div class="form-group">
+                                                                        <label for="surname">Surname</label>
+                                                                        <input type="text" class="form-control" id="surname" name="surname" required>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="col-md-6">
+                                                                    <div class="form-group">
+                                                                        <label for="gender">Gender</label>
+                                                                        <select class="form-control" id="gender" name="gender" required>
+                                                                            <option value="">Select Gender</option>
+                                                                            <option value="Male">Male</option>
+                                                                            <option value="Female">Female</option>
+                                                                        </select>
+                                                                    </div>
+                                                                </div>
                                                             </div>
-                                                        </div>
-                                                        <div class="col-md-12">
-                                                            <h4>Additional Information</h4>
-                                                        </div>                                                   
-                                                        <div class="col-md-6">
-                                                            <div class="form-group">
-                                                                <label for="address">Sheia Address</label>
-                                                                <input type="text" class="form-control" id="address" name="address" maxlength="100" required>
+                                                            
+                                                            <div class="form-row">
+                                                                <div class="col-md-6">
+                                                                    <div class="form-group">
+                                                                        <label for="date_of_birth">Date of Birth</label>
+                                                                        <input type="date" class="form-control" id="date_of_birth" name="date_of_birth" required>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="col-md-6">
+                                                                    <div class="form-group">
+                                                                        <label for="address">Address</label>
+                                                                        <input type="text" class="form-control" id="address" name="address" required>
+                                                                    </div>
+                                                                </div>
                                                             </div>
-                                                        </div>
-                                                        <div class="col-md-6">
-                                                            <div class="form-group">
-                                                                <label for="street_address">Street Address</label>
-                                                                <input type="text" class="form-control" id="street_address" name="street_address" maxlength="100" required>
+                                                            
+                                                            <div class="form-row">
+                                                                <div class="col-md-6">
+                                                                    <div class="form-group">
+                                                                        <label for="phone_number">Phone Number</label>
+                                                                        <input type="text" class="form-control" id="phone_number" name="phone_number" maxlength="15">
+                                                                    </div>
+                                                                </div>
+                                                                <div class="col-md-6">
+                                                                    <div class="form-group">
+                                                                        <label for="school_segment">School Education Level</label>
+                                                                        <select class="form-control" id="school_segment" name="school_segment" required>
+                                                                            <option value="">Select Education Level</option>
+                                                                            <option value="Nursery">Nursery</option>
+                                                                            <option value="Primary">Primary</option>
+                                                                            <option value="Secondary">Secondary</option>
+                                                                        </select>
+                                                                    </div>
+                                                                </div>
                                                             </div>
-                                                        </div>
-                                                        <div class="col-md-6">
-                                                            <div class="form-group">
-                                                                <label for="house_number">House Number</label>
-                                                                <input type="text" class="form-control" id="house_number" name="house_number" maxlength="50" required>
+                                                            
+                                                            <div class="form-row">
+                                                                <div class="col-md-6">
+                                                                    <div class="form-group">
+                                                                        <label for="current_class">Current Class</label>
+                                                                        <select class="form-control" id="current_class" name="current_class" required>
+                                                                            <option value="">Select Class</option>
+                                                                            <!-- Options will be populated dynamically based on the selected school segment -->
+                                                                        </select>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="col-md-6">
+                                                                    <div class="form-group">
+                                                                        <label for="birth_certificate_id">Birth Certificate ID</label>
+                                                                        <input type="text" class="form-control" id="birth_certificate_id" name="birth_certificate_id" required>
+                                                                    </div>
+                                                                </div>
                                                             </div>
-                                                        </div>
-                                                        <div class="col-md-6">
-                                                            <div class="form-group">
-                                                                <label for="health_status">Health Status</label>
-                                                                <input type="text" class="form-control" id="health_status" name="health_status" maxlength="100" required>
+                                                            
+                                                            <div class="form-row">
+                                                                <div class="col-md-6">
+                                                                    <div class="form-group">
+                                                                        <label for="birth_certificate_photo">Birth Certificate Photo</label>
+                                                                        <input type="file" class="form-control" id="birth_certificate_photo" name="birth_certificate_photo">
+                                                                    </div>
+                                                                </div>
+                                                                <div class="col-md-6">
+                                                                    <div class="form-group">
+                                                                        <label for="allergies">Allergies</label>
+                                                                        <input type="text" class="form-control" id="allergies" name="allergies">
+                                                                    </div>
+                                                                </div>
                                                             </div>
-                                                        </div>
-                                                        <div class="col-md-6">
-                                                            <div class="form-group">
-                                                                <label for="physical_disability">Physical Disability</label>
-                                                                <input type="text" class="form-control" id="physical_disability" name="physical_disability" maxlength="100" required>
+                                                            
+                                                            <div class="form-row">
+                                                                <div class="col-md-6">
+                                                                    <div class="form-group">
+                                                                        <label for="current_year">Current Year</label>
+                                                                        <input type="number" class="form-control" id="current_year" name="current_year">
+                                                                    </div>
+                                                                </div>
+                                                                <div class="col-md-6">
+                                                                    <div class="form-group">
+                                                                        <label for="is_finished">Is Finished</label>
+                                                                        <select class="form-control" id="is_finished" name="is_finished">
+                                                                            <option value="">Select</option>
+                                                                            <option value="False">Yes</option>
+                                                                            <option value="True">No</option>
+                                                                        </select>
+                                                                    </div>
+                                                                </div>
                                                             </div>
-                                                        </div>
-                                                        <div class="col-md-6">
-                                                            <div class="form-group">
-                                                                <label for="student_photo">Student Photo</label>
-                                                                <input type="file" class="form-control-file" id="student_photo" name="student_photo" required>
+                                                            
+                                                            <div class="form-row">
+                                                                <div class="col-md-6">
+                                                                    <div class="form-group">
+                                                                        <label for="sheia_address">Sheia Address</label>
+                                                                        <input type="text" class="form-control" id="sheia_address" name="sheia_address">
+                                                                    </div>
+                                                                </div>
+                                                                <div class="col-md-6">
+                                                                    <div class="form-group">
+                                                                        <label for="street_address">Street Address</label>
+                                                                        <input type="text" class="form-control" id="street_address" name="street_address">
+                                                                    </div>
+                                                                </div>
                                                             </div>
-                                                        </div>
-                                                        <div class="col-md-6">
-                                                            <div class="form-group">
-                                                                <label for="birth_certificate_id">Birth Certificate ID</label>
-                                                                <input type="text" class="form-control" id="birth_certificate_id" name="birth_certificate_id" maxlength="50">
+                                                            
+                                                            <div class="form-row">
+                                                                <div class="col-md-6">
+                                                                    <div class="form-group">
+                                                                        <label for="house_number">House Number</label>
+                                                                        <input type="text" class="form-control" id="house_number" name="house_number">
+                                                                    </div>
+                                                                </div>
+                                                                <div class="col-md-6">
+                                                                    <div class="form-group">
+                                                                        <label for="health_status">Health Status</label>
+                                                                        <input type="text" class="form-control" id="health_status" name="health_status">
+                                                                    </div>
+                                                                </div>
                                                             </div>
-                                                        </div>
-                                                        <div class="col-md-6">
-                                                            <div class="form-group">
-                                                                <label for="birth_certificate_photo">Birth Certificate Photo</label>
-                                                                <input type="file" class="form-control-file" id="birth_certificate_photo" name="birth_certificate_photo">
+                                                            
+                                                            <div class="form-row">
+                                                                <div class="col-md-6">
+                                                                    <div class="form-group">
+                                                                        <label for="physical_disability">Physical Disability</label>
+                                                                        <input type="text" class="form-control" id="physical_disability" name="physical_disability">
+                                                                    </div>
+                                                                </div>
+                                                                <div class="col-md-6">
+                                                                    <div class="form-group">
+                                                                        <label for="student_photo">Student Photo</label>
+                                                                        <input type="file" class="form-control" id="student_photo" name="student_photo">
+                                                                    </div>
+                                                                </div>
                                                             </div>
-                                                        </div>
-                                                        <div class="col-md-6">
-                                                            <div class="form-group">
-                                                                <label for="allergies">Allergies</label>
-                                                                <input type="text" class="form-control" id="allergies" name="allergies" maxlength="100">
-                                                            </div>
-                                                        </div>
-                                                        <div class="col-md-6">
-                                                            <div class="form-group">
-                                                                <label for="current_year">Current Year of Study</label>
-                                                                <input type="number" class="form-control" id="current_year" name="current_year">
-                                                            </div>
-                                                        </div>
-                                                        <div class="col-md-6">
-                                                            <div class="form-group">
-                                                                <label for="is_finished">Is Finished</label>
-                                                                <select class="form-control" id="is_finished" name="is_finished">
-                                                                    <option value="False">Not Finished</option>
-                                                                    <option value="True">Finished</option>
-                                                                </select>
-                                                            </div>
-                                                        </div>
-                                                        <div class="col-md-6">
-                                                            <div class="form-group">
-                                                                <label for="school_segment">School Segment</label>
-                                                                <select class="form-control" id="school_segment" name="school_segment" required>
-                                                                    <option value="Nursery">Nursery Level</option>
-                                                                    <option value="Primary">Primary Level</option>
-                                                                    <option value="Secondary">Secondary Level</option>
-                                                                </select>
-                                                            </div>
-                                                        </div>
-                                                        <div class="col-md-6">
-                                                            <div class="form-group">
-                                                                <label for="current_class">Current Class</label>
-                                                                <select class="form-control" id="current_class" name="current_class" required>
-                                                                    <!-- Choices will be dynamically populated based on the selected school segment -->
-                                                                </select>
-                                                            </div>
-                                                        </div>
+                                                            
+                                                     
+                                                        
+                                                   
                                                     </div>
-                                                    
-                                                    <!-- Father Information -->
-<!-- Additional Information -->
-<div class="row">
-    <div class="col-md-12">
-        <h4>Father Information</h4>
-    </div>
-    <div class="col-md-6">
-        <div class="form-group">
-            <label for="father_name">Father's Name</label>
-            <input type="text" class="form-control" id="father_name" name="father_name" maxlength="50" required>
-        </div>
-    </div>
-    <div class="col-md-6">
-        <div class="form-group">
-            <label for="father_phone_number">Father's Phone Number</label>
-            <input type="text" class="form-control" id="father_phone_number" name="father_phone_number" maxlength="50" required>
-        </div>
-    </div>
-
-    <div class="col-md-6">
-        <div class="form-group">
-            <label for="father_address">Father's Sheia Address</label>
-            <input type="text" class="form-control" id="father_address" name="father_address" maxlength="100" required>
-        </div>
-    </div>
-    <div class="col-md-6">
-        <div class="form-group">
-            <label for="father_street_address">Father's Street Address</label>
-            <input type="text" class="form-control" id="father_street_address" name="father_street_address" maxlength="100" required>
-        </div>
-    </div>
-    <div class="col-md-6">
-        <div class="form-group">
-            <label for="father_house_number">Father's House Number</label>
-            <input type="text" class="form-control" id="father_house_number" name="father_house_number" maxlength="50" required>
-        </div>
-    </div>
-    <div class="col-md-6">
-        <div class="form-group">
-            <label for="father_national_id">Father's National ID</label>
-            <input type="text" class="form-control" id="father_national_id" name="father_national_id" maxlength="50" required>
-        </div>
-    </div>
-    <div class="col-md-6">
-        <div class="form-group">
-            <label for="father_status">Father's Status</label>
-            <select class="form-control" id="father_status" name="father_status" required>
-                <option value="Deceased">Deceased</option>
-                <option value="Alive">Alive</option>
-            </select>
-        </div>
-    </div>
-    <div class="col-md-6">
-        <div class="form-group">
-            <label for="father_occupation">Father's Occupation</label>
-            <input type="text" class="form-control" id="father_occupation" name="father_occupation" maxlength="50" required>
-        </div>
-    </div>
-</div>
-                                                    <!-- Additional Information -->
-<div class="row">
-    <div class="col-md-12">
-        <h4>Mother Information</h4>
-    </div>
-    <div class="col-md-4">
-        <div class="form-group">
-            <label for="mother_name">Mother's Name</label>
-            <input type="text" class="form-control" id="mother_name" name="mother_name" maxlength="50" required>
-        </div>
-    </div>
-    <div class="col-md-4">
-        <div class="form-group">
-            <label for="mother_phone_number">Mother's Phone Number</label>
-            <input type="text" class="form-control" id="mother_phone_number" name="mother_phone_number" maxlength="50" required>
-        </div>
-    </div>
-    <div class="col-md-4">
-        <div class="form-group">
-            <label for="mother_occupation">Mother's Occupation</label>
-            <input type="text" class="form-control" id="mother_occupation" name="mother_occupation" maxlength="50" required>
-        </div>
-    </div>
-    <div class="col-md-6">
-        <div class="form-group">
-            <label for="mother_address">Mother's Sheia Address</label>
-            <input type="text" class="form-control" id="mother_address" name="mother_address" maxlength="100" required>
-        </div>
-    </div>
-    <div class="col-md-6">
-        <div class="form-group">
-            <label for="mother_street_address">Mother's Street Address</label>
-            <input type="text" class="form-control" id="mother_street_address" name="mother_street_address" maxlength="100" required>
-        </div>
-    </div>
-    <div class="col-md-6">
-        <div class="form-group">
-            <label for="mother_house_number">Mother's House Number</label>
-            <input type="text" class="form-control" id="mother_house_number" name="mother_house_number" maxlength="50" required>
-        </div>
-    </div>
-    <div class="col-md-6">
-        <div class="form-group">
-            <label for="mother_national_id">Mother's National ID</label>
-            <input type="text" class="form-control" id="mother_national_id" name="mother_national_id" maxlength="50" required>
-        </div>
-    </div>
-    <div class="col-md-6">
-        <div class="form-group">
-            <label for="mother_status">Mother's Status</label>
-            <select class="form-control" id="mother_status" name="mother_status" required>
-                <option value="Deceased">Deceased</option>
-                <option value="Alive">Alive</option>
-            </select>
-        </div>
-    </div>
-</div>
-
-
-<!-- Additional Information -->
-<div class="row">
-    <div class="col-md-12">
-        <h4>Guardian Information</h4>
-    </div>
-    <div class="col-md-4">
-        <div class="form-group">
-            <label for="male_guardian_name">Guardian's Name</label>
-            <input type="text" class="form-control" id="guardian_name" name="guardian_name" maxlength="50" required>
-        </div>
-    </div>
-    <div class="col-md-4">
-        <div class="form-group">
-            <label for="male_guardian_phone_number">Guardian's Phone Number</label>
-            <input type="text" class="form-control" id="guardian_phone_number" name="guardian_phone_number" maxlength="50" required>
-        </div>
-    </div>
-    <div class="col-md-4">
-        <div class="form-group">
-            <label for="male_guardian_occupation">Guardian's Occupation</label>
-            <input type="text" class="form-control" id="guardian_occupation" name="guardian_occupation" maxlength="50" required>
-        </div>
-    </div>
-    <div class="col-md-6">
-        <div class="form-group">
-            <label for="male_guardian_address"> Guardian's Sheia Address</label>
-            <input type="text" class="form-control" id="guardian_address" name="guardian_address" maxlength="100" required>
-        </div>
-    </div>
-    <div class="col-md-6">
-        <div class="form-group">
-            <label for="male_guardian_street_address">Guardian's Street Address</label>
-            <input type="text" class="form-control" id="guardian_street_address" name="guardian_street_address" maxlength="100" required>
-        </div>
-    </div>
-    <div class="col-md-6">
-        <div class="form-group">
-            <label for="male_guardian_house_number">Guardian's House Number</label>
-            <input type="text" class="form-control" id="guardian_house_number" name="guardian_house_number" maxlength="50" required>
-        </div>
-    </div>
-    <div class="col-md-6">
-        <div class="form-group">
-            <label for="male_guardian_national_id">Guardian's National ID</label>
-            <input type="text" class="form-control" id="guardian_national_id" name="guardian_national_id" maxlength="50" required>
-        </div>
-    </div>
-    <div class="col-md-6">
-        <div class="form-group">
-            <label for="male_guardian_status">Guardian's Status</label>
-            <select class="form-control" id="guardian_status" name="guardian_status" required>
-                <option value="Deceased">Deceased</option>
-                <option value="Alive">Alive</option>
-            </select>
-        </div>
-    </div>
-    <div class="col-md-6">
-        <div class="form-group">
-            <label for="student_gender">Guardian's Gender</label>
-            <select class="form-control" id="guardian_gender" name="guardian_gender" required>
-                <option value="M">Male</option>
-                <option value="F">Female</option>
-            </select>
-        </div>
-    </div>
-
-</div>
-
-                                                    
-                                                   <!-- Additional Information -->
-<div class="row">
-    <div class="col-md-12">
-        <h4>Sponsor Information</h4>
-    </div>
-    <div class="col-md-4">
-        <div class="form-group">
-            <label for="sponsor_name">Sponsor's Name</label>
-            <input type="text" class="form-control" id="sponsor_name" name="sponsor_name" maxlength="50" required>
-        </div>
-    </div>
-    <div class="col-md-4">
-        <div class="form-group">
-            <label for="sponsor_phone_number">Sponsor's Phone Number</label>
-            <input type="text" class="form-control" id="sponsor_phone_number" name="sponsor_phone_number" maxlength="50" required>
-        </div>
-    </div>
-    <div class="col-md-4">
-        <div class="form-group">
-            <label for="sponsor_occupation">Sponsor's Occupation</label>
-            <input type="text" class="form-control" id="sponsor_occupation" name="sponsor_occupation" maxlength="50" required>
-        </div>
-    </div>
-    <div class="col-md-6">
-        <div class="form-group">
-            <label for="sponsor_address">Sponsor's Sheia Address</label>
-            <input type="text" class="form-control" id="sponsor_address" name="sponsor_address" maxlength="100" required>
-        </div>
-    </div>
-    <div class="col-md-6">
-        <div class="form-group">
-            <label for="sponsor_street_address">Sponsor's Street Address</label>
-            <input type="text" class="form-control" id="sponsor_street_address" name="sponsor_street_address" maxlength="100" required>
-        </div>
-    </div>
-    <div class="col-md-6">
-        <div class="form-group">
-            <label for="sponsor_house_number">Sponsor's House Number</label>
-            <input type="text" class="form-control" id="sponsor_house_number" name="sponsor_house_number" maxlength="50" required>
-        </div>
-    </div>
-    <div class="col-md-6">
-        <div class="form-group">
-            <label for="sponsor_national_id">Sponsor's National ID</label>
-            <input type="text" class="form-control" id="sponsor_national_id" name="sponsor_national_id" maxlength="50" required>
-        </div>
-    </div>
-    <div class="col-md-6">
-        <div class="form-group">
-            <label for="sponsor_status">Sponsor's Status</label>
-            <select class="form-control" id="sponsor_status" name="sponsor_status" required>
-                <option value="Deceased">Deceased</option>
-                <option value="Alive">Alive</option>
-            </select>
-        </div>
-    </div>
-</div>
-<div>
-    {% if messages %}
-    <div class="col-12">
-      {% for message in messages %}
-        {% if message.tags == 'error' %}
-          <div class="alert alert-danger">{{ message }}</div>
-        {% elif message.tags == 'success' %}
-          <div class="alert alert-primary">{{ message }}</div>
-        {% endif %}
-      {% endfor %}
-    </div>
-  {% endif %}
-</div>
-                                                    
-                                                    <button type="submit" class="btn btn-primary">Submit</button>
-                                                </form>
+                                                </div>
+                                      
+                                        </div>
+                                        <div class="card-footer">
+                                            <div class="form-row">
+                                                <div>
+                                                    {% if messages %}
+                                                        <div class="col-12">
+                                                            {% for message in messages %}
+                                                                {% if message.tags == 'error' %}
+                                                                    <div class="alert alert-danger">{{ message }}</div>
+                                                                {% elif message.tags == 'success' %}
+                                                                    <div class="alert alert-primary">{{ message }}</div>
+                                                                {% endif %}
+                                                            {% endfor %}
+                                                        </div>
+                                                    {% endif %}
+                                                </div>
+                                            </div>
+                                            <div class="form-row">
+                                                <div class="col-md-12">
+                                                    <button type="submit" class="btn btn-primary btn-block">Add Student</button>
+                                                </div>
                                             </div>
                                         </div>
-                                    </div>
+                                    </form>
                                 </div>
                                 <!--/.col (right) -->
                             </div>
                         </div>
                     </div>
-                </section>
+            
                 <!-- /.content -->
-            </div>
-        </div><!-- /.container-fluid -->
-    </section>
+     
+    
+ 
 
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script>
-        <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-        <script>
-            $(document).ready(function() {
-                var segmentSelect = $('#school_segment');
-                var classSelect = $('#current_class');
-            
-                classSelect.prop('disabled', true);
-            
-                segmentSelect.change(function() {
-                    var selectedSegment = $(this).val();
-                    classSelect.empty().prop('disabled', true);
-            
-                    if (selectedSegment) {
-                        $.ajax({
-                            url: '{% url "get_class_choices" %}',
-                            data: {
-                                segment: selectedSegment
-                            },
-                            dataType: 'json',
-                            success: function(response) {
-                                console.log(response)
-                                if (response.choices) {
-                                    $.each(response.choices, function(key, value) {
-                                        classSelect.append($('<option>').text(value[1]).attr('value', value[0]));
-                                            
-                                    });
-                                    classSelect.prop('disabled', false);
-                                }
+        $(document).ready(function() {
+            var segmentSelect = $('#school_segment');
+            var classSelect = $('#current_class');
+        
+            classSelect.prop('disabled', true);
+        
+            segmentSelect.change(function() {
+                var selectedSegment = $(this).val();
+                classSelect.empty().prop('disabled', true);
+        
+                if (selectedSegment) {
+                    $.ajax({
+                        url: '{% url "get_class_choices" %}',
+                        data: {
+                            segment: selectedSegment
+                        },
+                        dataType: 'json',
+                        success: function(response) {
+                            console.log(response);
+                            if (response.choices) {
+                                $.each(response.choices, function(key, value) {
+                                    classSelect.append($('<option>').text(value[1]).attr('value', value[0]));
+                                        
+                                });
+                                classSelect.prop('disabled', false);
                             }
-                        });
-                    }
-                });
-            
-                // Manually trigger the change event on page load if a segment is already selected
-                segmentSelect.trigger('change');
+                        }
+                    });
+                }
             });
-        </script>
+        
+            // Manually trigger the change event on page load if a segment is already selected
+            segmentSelect.trigger('change');
+        });
+    </script>
 {% endblock main_content %}
