@@ -15,6 +15,7 @@ from django.contrib.auth.hashers import make_password
 from django.shortcuts import render, get_object_or_404
 from django.shortcuts import render, redirect
 from django.db import IntegrityError, DatabaseError
+from django.db.models import Q
 
 
 
@@ -24,6 +25,7 @@ def admin_home(request):
   
     staff_count = Staffs.objects.all().count()
     subject_count = Subject.objects.all().count()
+    student_count = Students.objects.all().count()
    
     subject_count_list = []
 
@@ -60,7 +62,7 @@ def admin_home(request):
         attendance_present_student_list.append(attendance) 
         attendance_absent_student_list.append(leaves+absent) 
         student_name_list.append(student.admin.username)  
-    return render(request,"hod_template/home_content.html",{"staff_count":staff_count,"subject_count":subject_count,"subject_count_list":subject_count_list,"subject_list":subject_list,"student_count_in_subject_list":student_count_in_subject_list,"attendance_present_staff_list":attendance_present_staff_list,"attendance_absent_staff_list":attendance_absent_staff_list,"staff_name_list":staff_name_list,"student_name_list":student_name_list,"attendance_present_student_list":attendance_present_student_list,"attendance_absent_student_list":attendance_absent_student_list})
+    return render(request,"hod_template/home_content.html",{"staff_count":staff_count,"subject_count":subject_count,"subject_count_list":subject_count_list,"subject_list":subject_list,"student_count_in_subject_list":student_count_in_subject_list,"attendance_present_staff_list":attendance_present_staff_list,"attendance_absent_staff_list":attendance_absent_staff_list,"staff_name_list":staff_name_list,"student_name_list":student_name_list,"attendance_present_student_list":attendance_present_student_list,"attendance_absent_student_list":attendance_absent_student_list,"student_count":student_count})
 
 
 
@@ -151,28 +153,25 @@ def add_subject_save(request):
         return HttpResponse("Method not allowed")
     
     else:        
-        forms = AddSubjectForm(request.POST)
-        if forms.is_valid():
-            subject_name = forms.cleaned_data["subject_name"]            
-            staff_id = forms.cleaned_data["staff_name"]
+        form = AddSubjectForm(request.POST)
+        if form.is_valid():
+            subject_name = form.cleaned_data["subject_name"]
+            school_segment = form.cleaned_data["school_segment"]
             
             try:
-                
-                staff = CustomUser.objects.get(id=staff_id)
-                
-                subject = Subject(subject_name=subject_name, staff_id=staff)
+                subject = Subject(subject_name=subject_name, school_segment=school_segment)
                 subject.save()
                 
                 messages.success(request, "Subject successfully added")
                 return HttpResponseRedirect(reverse("addsubject"))  
             
-            except ObjectDoesNotExist:
-                messages.error(request, "Failed to add subject.  or staff not found.")
+            except Exception as e:
+                messages.error(request, f"Failed to add subject. Error: {str(e)}")
                 return HttpResponseRedirect(reverse("addsubject"))
             
-            except Exception as e:
-                messages.error(request, f"An error occurred: {str(e)}")
-                return HttpResponseRedirect(reverse("addsubject"))
+        else:
+            messages.error(request, "Invalid form submission. Please check the form fields.")
+            return HttpResponseRedirect(reverse("addsubject"))
             
 
 def add_subject(request):
@@ -326,6 +325,7 @@ def add_student_save(request):
             # Extract form data
             first_name = request.POST.get('first_name')
             surname = request.POST.get('surname')
+            service_type = request.POST.get('service_type')
             last_name = request.POST.get('last_name')
             date_of_birth_str = request.POST.get('date_of_birth')
             date_of_birth = datetime.strptime(date_of_birth_str, '%Y-%m-%d').date()
@@ -378,6 +378,7 @@ def add_student_save(request):
                 # Create a new instance of the Student model             
                 user.students.first_name = first_name
                 user.students.surname = surname
+                user.students.service_type = service_type
                 user.students.last_name = last_name
                 user.students.date_of_birth = date_of_birth
                 user.students.gender = gender
@@ -447,12 +448,19 @@ def single_parent_detail(request, parent_id):
 
   
 def manage_student(request):
-    per_page = request.GET.get('per_page', 3)  # Get the number of items to display per page from the request
+    per_page = request.GET.get('per_page', 3)
+    current_class = request.GET.get('current_class')  # Get the selected class from the request
     students = Students.objects.all()
+    
+    if current_class:  # Filter students by class if it is selected
+        students = students.filter(current_class=current_class)
+    
     paginator = Paginator(students, per_page)
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
+    
     return render(request, "hod_template/manage_student.html", {"students": students, "page_obj": page_obj})
+
 
 def manage_parent(request):
     per_page = request.GET.get('per_page', 3)  # Get the number of items to display per page from the request
@@ -486,14 +494,25 @@ def manage_staff(request):
     return render(request,"hod_template/manage_staff.html",{"staffs":staffs,"page_obj":page_obj})  
 
 
-def manage_subject(request):   
-    per_page = request.GET.get('per_page', 3)  # Get the number of items to display per page from the request
-    subjects =Subject.objects.all() 
+def manage_subject(request):
+    per_page = request.GET.get('per_page', 3)
+    search_query = request.GET.get('search', '')
+
+    subjects = Subject.objects.filter(
+        Q(subject_name__icontains=search_query) | Q(school_segment__icontains=search_query)
+    )
+
     paginator = Paginator(subjects, per_page)
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
-    return render(request,"hod_template/manage_subject.html",{"subjects":subjects,"page_obj":page_obj})
-  
+
+    return render(request, "hod_template/manage_subject.html", {
+        "subjects": subjects,
+        "page_obj": page_obj,
+        "search_query": search_query,
+    })
+    
+    
 def edit_staff(request,staff_id): 
     request.session['staff_id'] = staff_id 
     staffs = Staffs.objects.get(admin = staff_id)
@@ -560,6 +579,7 @@ def edit_student_save(request):
         # Get the form data
         first_name = request.POST.get('first_name')
         surname = request.POST.get('surname')
+        service_type = request.POST.get('service_type')
         last_name = request.POST.get('last_name')
         date_of_birth_str = request.POST.get('date_of_birth')
         date_of_birth = datetime.strptime(date_of_birth_str, '%Y-%m-%d').date()
@@ -590,6 +610,7 @@ def edit_student_save(request):
         # Update student information
         student = Students.objects.get(admin=user)
         student.surname = surname
+        student.service_type = service_type
         student.date_of_birth = date_of_birth
         student.gender = gender
         student.phone_number = phone_number

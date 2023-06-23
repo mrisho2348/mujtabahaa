@@ -234,24 +234,24 @@ class AddCourseForm(forms.Form):
 
 
 class AddSubjectForm(forms.Form):
-    subject_name = forms.CharField(label='Subject Name',max_length=50,widget = forms.TextInput(attrs={"class":"form-control"}))
+    SCHOOL_SEGMENT_CHOICES = (
+        ('Nursery', 'Nursery'),
+        ('Primary', 'Primary'),
+        ('Secondary', 'Secondary'),
+    )
+
+    subject_name = forms.CharField(
+        label='Subject Name',
+        max_length=50,
+        widget=forms.TextInput(attrs={"class": "form-control"})
+    )
+    school_segment = forms.ChoiceField(
+        label='School level',
+        choices=SCHOOL_SEGMENT_CHOICES,
+        widget=forms.Select(attrs={"class": "form-control"})
+    )
     
-    # courses = Courses.objects.all()
-    # staffs = Staffs.objects.all()
-    # # course_list = []
-    # # for course in courses:
-    # #     small_course = (course.id,course.Course_name)
-    # #     course_list.append(small_course)
     
-    # staff_list = []
-    # for staff in staffs:
-    #   small_staff = (staff.admin_id, staff.admin.first_name + " " + staff.admin.last_name)
-    #   staff_list.append(small_staff)   
-    
-    
-    # course_name = forms.ChoiceField(label='Course Name', choices=course_list, widget=forms.Select(attrs={"class":"form-control"}))
-    # staff_name = forms.ChoiceField(label='Staff Name', choices=staff_list, widget=forms.Select(attrs={"class":"form-control"}))
- 
 class AddSessionYearForm(forms.Form):
     session_start = forms.DateField(label='Session start year',widget = forms.DateInput(attrs={"class":"form-control","placeholder":"Enter session start year","type":"date"}))
     session_end = forms.DateField(label='Session end year',widget = forms.DateInput(attrs={"class":"form-control","placeholder":"Enter session end year","type":"date"}))

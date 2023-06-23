@@ -198,6 +198,18 @@ Edit Student | username: {{ username}} | #ID. {{id}}
                                                                         {% endif %}
                                                                     </div>
                                                                 </div>
+                                                                <div class="col-md-6">
+                                                                    <div class="form-group">
+                                                                        <label for="service_type">service type</label>
+                                                                        <select class="form-control" id="service_type" name="service_type">
+                                                                            <option value="">Select type of service</option>
+                                                                            <option value="school" {% if students.service_type == 'school' %}selected{% endif %}>School</option>
+                                                                            <option value="madrasa" {% if students.service_type == 'madrasa' %}selected{% endif %}>Madrasa</option>
+                                                                            <option value="lunch" {% if students.service_type == 'lunch' %}selected{% endif %}>Lunch</option>
+                                                                            <option value="transport" {% if students.service_type == 'transport' %}selected{% endif %}>Transport</option>
+                                                                        </select>
+                                                                    </div>
+                                                                </div>
                                                             </div>
                                                             
                                                      

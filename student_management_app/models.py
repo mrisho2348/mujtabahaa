@@ -22,26 +22,90 @@ class AdminHOD(models.Model):
     updated_at = models.DateTimeField(auto_now_add=True)
     objects = models.Manager()
 
-    
 class Staffs(models.Model):
     id = models.AutoField(primary_key=True)
     admin = models.OneToOneField(CustomUser, on_delete=models.CASCADE)
     address = models.TextField()
+    date_of_birth = models.DateField(blank=True, default='2000-01-01')
+    contact_number = models.CharField(max_length=20,blank=True)
+    background_check = models.TextField(blank=True)
+    availability = models.CharField(max_length=255,blank=True)
+    preferred_grade_level = models.CharField(max_length=255,blank=True)
+    salary_expectations = models.CharField(max_length=255,blank=True)
+    personal_statement = models.TextField(blank=True)
     fcm_token = models.TextField(default="")
-    created_at = models.DateTimeField(auto_now_add=True) 
-    updated_at = models.DateTimeField(auto_now_add=True)      
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    subjects = models.ManyToManyField('Subject', related_name='staffs', blank=True)
     objects = models.Manager()
+    
 
-
-      
-      
 class Subject(models.Model):
     id = models.AutoField(primary_key=True)
-    subject_name = models.CharField(max_length=255)    
-    staff_id = models.ForeignKey(CustomUser,on_delete=models.CASCADE)
+    school_segment = models.CharField(max_length=255, null=True, blank=True)
+    subject_name = models.CharField(max_length=255, null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now_add=True)       
+    updated_at = models.DateTimeField(auto_now=True)
     objects = models.Manager()
+    
+class Qualifications(models.Model):
+    id = models.AutoField(primary_key=True)
+    staff = models.OneToOneField(Staffs, on_delete=models.CASCADE)
+    teaching_experience = models.IntegerField()
+    educational_qualification = models.CharField(max_length=255)
+    certification = models.CharField(max_length=255)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    objects = models.Manager()
+    
+class Skills(models.Model):
+    id = models.AutoField(primary_key=True)
+    staff_id = models.OneToOneField(Staffs, on_delete=models.CASCADE)
+    subject_expertise = models.TextField()
+    teaching_methods = models.TextField()
+    professional_development = models.TextField()
+    language_proficiency = models.TextField()
+    technology_skills = models.TextField()
+    special_skills = models.TextField()
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    objects = models.Manager()
+    
+    
+class EmploymentHistory(models.Model):
+    id = models.AutoField(primary_key=True)
+    staff_id = models.OneToOneField(Staffs, on_delete=models.CASCADE)
+    employment_history = models.TextField()
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    objects = models.Manager()
+    
+class References(models.Model):
+    id = models.AutoField(primary_key=True)
+    staff = models.OneToOneField(Staffs, on_delete=models.CASCADE)
+    reference = models.TextField()
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    objects = models.Manager()    
+
+class Meetings(models.Model):
+    id = models.AutoField(primary_key=True)
+    date = models.DateField()
+    start_time = models.TimeField()
+    end_time = models.TimeField()
+    location = models.CharField(max_length=255)
+    agenda = models.TextField()
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    objects = models.Manager()
+    
+class Attendees(models.Model):
+    id = models.AutoField(primary_key=True)
+    staff_id = models.ForeignKey(Staffs, on_delete=models.CASCADE)
+    meeting_id = models.ForeignKey(Meetings, on_delete=models.CASCADE)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    objects = models.Manager() 
     
 
 
@@ -52,6 +116,7 @@ class Students(models.Model):
     id = models.AutoField(primary_key=True)
     admin = models.OneToOneField(CustomUser,on_delete=models.CASCADE)  
     surname = models.CharField(max_length=100)    
+    service_type = models.CharField(max_length=100,default='school',blank=True)    
     date_of_birth = models.DateField(blank=True, null=True)
     gender = models.CharField(max_length=10)    
     phone_number = models.CharField(max_length=20)

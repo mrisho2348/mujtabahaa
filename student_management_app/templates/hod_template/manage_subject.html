@@ -15,7 +15,7 @@
   <div class="table-responsive">
     <div class="row">
       <div class="col-md-3 ">
-        <form method="GET" action="{% url 'manage_student' %}">
+        <form method="GET" action="{% url 'manage_subject' %}">
             <div class="input-group ">              
                 <input type="number" name="per_page" class="form-control" placeholder="Items per page" aria-label="Items per page" aria-describedby="per-page-btn" min="1">
                 <div class="input-group-prepend">
@@ -26,12 +26,12 @@
         <p>Show <strong>{{ page_obj.paginator.per_page }}</strong> Entries</p>
     </div>
         <div class="col-md-6 ml-5">
-            <form method="GET" action="{% url 'student-list' %}">
-                <div class="input-group mb-3">                
-                    <input type="text" name="search" class="form-control" placeholder="Search by subject name" aria-label="Search" aria-describedby="search-btn">
+            <form method="GET" action="{% url 'manage_subject' %}">
+                <div class="input-group mb-3">
+                    <input type="text" name="search" class="form-control" placeholder="Search by subject name or school segment" aria-label="Search" aria-describedby="search-btn">
                     <div class="input-group-prepend">
-                      <button class="btn btn-primary" type="submit" id="search-btn">Search</button>
-                  </div>
+                        <button class="btn btn-primary" type="submit" id="search-btn">Search</button>
+                    </div>
                 </div>
             </form>
         </div>
@@ -44,9 +44,7 @@
         <tr>
           <th>ID</th>                          
           <th>Subject Name</th>                          
-          <th>Course Name</th>
-          <th>Course Id </th>                          
-          <th>Staff Name</th>                                                      
+          <th>School Level</th>                                                         
           <th>Action</th>
         </tr>
       </thead>
@@ -58,9 +56,9 @@
         
               <td>{{subject.id}}</td>                    
               <td>{{subject.subject_name}}</td>                    
-              <td>{{subject.course_id.Course_name}}</td>                    
-              <td>{{subject.course_id.id}}</td>                    
-              <td>{{subject.staff_id.first_name}} {{subject.staff_id.last_name}}</td>                    
+              <td>{{subject.school_segment}}</td>                
+                             
+                          
 
                 <td class="text-center">
                     <a href="#">
